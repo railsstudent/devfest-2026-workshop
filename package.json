@@ -10,7 +10,7 @@
     "serve": "serve public"
   },
   "devDependencies": {
-    "@deepakvishwakarma/node-claat": "^0.2.0",
-    "serve": "^14.2.8"
+    "@deepakvishwakarma/node-claat": "0.2.0",
+    "serve": "14.2.8"
   }
 }

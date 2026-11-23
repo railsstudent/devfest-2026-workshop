@@ -1,0 +1,16 @@
+{
+  "name": "devfest-2026-workshop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Building a workshop to build an Angular web app with Firebase AI Logic Server Prompt Template",
+  "scripts": {
+    "clean": "rm -rf public",
+    "prebuild": "npm run clean",
+    "build": "node-claat --docs docs --output public",
+    "serve": "serve public"
+  },
+  "devDependencies": {
+    "@deepakvishwakarma/node-claat": "^0.2.0",
+    "serve": "^14.2.8"
+  }
+}

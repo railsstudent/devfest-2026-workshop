@@ -270,26 +270,31 @@
 
         <button class="step-nav-item" data-step="2" type="button">
           <span class="step-num">3</span>
-          <span class="step-label">Part 1: Enable Firebase AI Logic and App Check</span>
+          <span class="step-label">Part 1: Enable Firebase AI Logic</span>
         </button>
 
         <button class="step-nav-item" data-step="3" type="button">
           <span class="step-num">4</span>
-          <span class="step-label">Part 1: Assign Billing Account to the Firebase Project</span>
+          <span class="step-label">Part 1: Enable App Check</span>
         </button>
 
         <button class="step-nav-item" data-step="4" type="button">
           <span class="step-num">5</span>
-          <span class="step-label">Part 1: Create Server Prompt Templates</span>
+          <span class="step-label">Part 1: Assign Billing Account to the Firebase Project</span>
         </button>
 
         <button class="step-nav-item" data-step="5" type="button">
           <span class="step-num">6</span>
-          <span class="step-label">Part 1: Configure Firebase Remote Config</span>
+          <span class="step-label">Part 1: Create Server Prompt Templates</span>
         </button>
 
         <button class="step-nav-item" data-step="6" type="button">
           <span class="step-num">7</span>
+          <span class="step-label">Part 1: Configure Firebase Remote Config</span>
+        </button>
+
+        <button class="step-nav-item" data-step="7" type="button">
+          <span class="step-num">8</span>
           <span class="step-label">Part 2: Angular Application Integration</span>
         </button>
     </nav>
@@ -343,18 +348,33 @@
 
       <section class="step-panel" data-step="2">
         <div class="step-header">
-          <h2>3. Part 1: Enable Firebase AI Logic and App Check</h2>
+          <h2>3. Part 1: Enable Firebase AI Logic</h2>
           
         </div>
         <div class="step-body">
-          <p>Duration: 10</p>
-<h3>1. Enable Firebase AI Logic</h3>
+          <p>Duration: 1 minutes</p>
+<h3>Enable Firebase AI Logic</h3>
 <ol>
-<li>In the Firebase Console sidebar, navigate to <strong>Firebase -&gt; AI Services -&gt; AI Logic -&gt; Gemini Developer API</strong>.</li>
-<li>Enable the <strong>Gemini Developer API</strong> provider.</li>
-<li>Enable <strong>template-only mode</strong> so the client app can only execute pre-registered Server Prompt Templates.</li>
+<li>In the Firebase Console sidebar, navigate to <strong>Firebase -&gt; AI Services -&gt; AI Logic -&gt; Get Started</strong>.</li>
+<li>Enable the <strong>Gemini Developer API</strong> provider. Click the <strong>Get started with this API</strong> button</li>
 </ol>
-<h3>2. Enable App Check</h3>
+<img src="images/enable-api.png" alt="Enable Gemini Developer API" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" />
+3. Keep the default settings to enable the API, AI Monitoring, and finish
+4. The overview of **Firebase AI Logic** displays the web app.<img src="images/firebase-ai-logic-enabled.png" alt="Firebase AI Logic enabled" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /><ol start="5">
+<li>Click the <strong>Settings</strong> tab, scroll down to <strong>Enforce template-only mode</strong> to enable <strong>template-only mode</strong> so the client app can only execute pre-registered Server Prompt Templates.</li>
+</ol>
+<img src="images/enforce-template-mode-only.png" alt="Enforce Template Mode Only" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" />
+        </div>
+      </section>
+
+      <section class="step-panel" data-step="3">
+        <div class="step-header">
+          <h2>4. Part 1: Enable App Check</h2>
+          
+        </div>
+        <div class="step-body">
+          <p>Duration: 5 minutes</p>
+<h3>Enable App Check</h3>
 <ol>
 <li>In the Firebase Console sidebar, navigate to <strong>Firebase -&gt; Security -&gt; App Check</strong>.</li>
 <li>Click <strong>Set up</strong> and configure the following protections:<ul>
@@ -368,9 +388,9 @@
         </div>
       </section>
 
-      <section class="step-panel" data-step="3">
+      <section class="step-panel" data-step="4">
         <div class="step-header">
-          <h2>4. Part 1: Assign Billing Account to the Firebase Project</h2>
+          <h2>5. Part 1: Assign Billing Account to the Firebase Project</h2>
           
         </div>
         <div class="step-body">
@@ -385,9 +405,9 @@
         </div>
       </section>
 
-      <section class="step-panel" data-step="4">
+      <section class="step-panel" data-step="5">
         <div class="step-header">
-          <h2>5. Part 1: Create Server Prompt Templates</h2>
+          <h2>6. Part 1: Create Server Prompt Templates</h2>
           
         </div>
         <div class="step-body">
@@ -533,9 +553,9 @@ You are an expert at summarizing videos, finding the topic, and generating tags 
         </div>
       </section>
 
-      <section class="step-panel" data-step="5">
+      <section class="step-panel" data-step="6">
         <div class="step-header">
-          <h2>6. Part 1: Configure Firebase Remote Config</h2>
+          <h2>7. Part 1: Configure Firebase Remote Config</h2>
           
         </div>
         <div class="step-body">
@@ -560,9 +580,9 @@ You are an expert at summarizing videos, finding the topic, and generating tags 
         </div>
       </section>
 
-      <section class="step-panel" data-step="6">
+      <section class="step-panel" data-step="7">
         <div class="step-header">
-          <h2>7. Part 2: Angular Application Integration</h2>
+          <h2>8. Part 2: Angular Application Integration</h2>
           
         </div>
         <div class="step-body">

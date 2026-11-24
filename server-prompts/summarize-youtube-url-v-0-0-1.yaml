@@ -1,0 +1,18 @@
+model: "gemini-3.8-flash"
+config:
+  candidateCount: 1
+  thinkingConfig:
+    thinkingLevel: high
+    includeThoughts: false
+location: global
+responseModalities: ["TEXT"]
+input:
+  schema:
+     url: string
+     mime_type: string
+output:
+  format: json
+  schema:
+    summary: string, summary of the URL
+    topic?: string, topic of the URL
+    tags(array, list of tags relevant to the video): string 

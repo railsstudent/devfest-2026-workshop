@@ -6,11 +6,13 @@
   "scripts": {
     "clean": "rm -rf public",
     "prebuild": "npm run clean",
-    "build": "node-claat --docs docs --output public",
-    "serve": "serve public"
+    "build": "node scripts/build-codelab.mjs",
+    "postbuild": "cp -r docs/images public/angular-firebase-ai-logic-server-prompt-template/",
+    "serve": "serve public",
+    "preview": "npm run build && npm run serve"
   },
   "devDependencies": {
-    "@deepakvishwakarma/node-claat": "0.2.0",
+    "marked": "18.2.1",
     "serve": "14.2.8"
   }
 }

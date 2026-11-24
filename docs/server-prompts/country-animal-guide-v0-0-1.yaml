@@ -1,0 +1,12 @@
+model: "gemini-nano-banana-2.1"
+config:
+  candidateCount: 1
+  thinkingLevel: MINIMAL
+  includeThoughts: false
+tools:
+  - googleSearch
+responseModalities: ["IMAGE"]
+location: global
+input:
+  schema:
+    country: string, The country name.

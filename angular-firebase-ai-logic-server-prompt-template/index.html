@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build an Angular Web App with Firebase AI Logic Server Prompt Templates</title>
+  <style>
+    :root {
+      --bg: #f8f9fa;
+      --surface: #ffffff;
+      --border: #dadce0;
+      --text: #202124;
+      --muted: #5f6368;
+      --primary: #1a73e8;
+      --primary-soft: #e8f0fe;
+      --code-bg: #f1f3f4;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.65;
+    }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar-title {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+    .topbar-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.875rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .topbar-meta a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 290px minmax(0, 1fr);
+      max-width: 1280px;
+      margin: 0 auto;
+      gap: 24px;
+      padding: 24px;
+      align-items: start;
+    }
+    .sidebar {
+      position: sticky;
+      top: 72px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .step-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      text-align: left;
+      padding: 10px 12px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .step-nav-item:hover {
+      background: var(--bg);
+    }
+    .step-nav-item.active {
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .step-num {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: var(--bg);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .step-nav-item.active .step-num {
+      background: var(--primary);
+      color: #ffffff;
+    }
+    .content-area {
+      min-width: 0;
+    }
+    .step-panel {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 32px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+    .step-panel.active {
+      display: block;
+    }
+    .step-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 14px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .step-header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    .step-duration {
+      flex-shrink: 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+      background: var(--bg);
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+    .step-body h3 {
+      margin-top: 24px;
+      margin-bottom: 10px;
+      font-size: 1.15rem;
+    }
+    .step-body a {
+      color: var(--primary);
+    }
+    .step-body img {
+      display: block;
+      margin: 16px 0;
+      max-width: 100%;
+      height: auto;
+    }
+    .step-body code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.9em;
+      background: var(--code-bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .code-wrapper {
+      position: relative;
+      margin: 14px 0 20px;
+    }
+    .code-wrapper pre {
+      margin: 0;
+      padding: 16px 76px 16px 16px;
+      background: #1e293b;
+      color: #f8fafc;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.875rem;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .code-wrapper pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      font-size: inherit;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 5px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.22);
+    }
+    .step-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+    .nav-btn {
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.92rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .nav-btn.primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    @media (max-width: 860px) {
+      .layout {
+        grid-template-columns: 1fr;
+        padding: 14px;
+      }
+      .sidebar {
+        position: static;
+      }
+      .step-panel {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <h1 class="topbar-title">Build an Angular Web App with Firebase AI Logic Server Prompt Templates</h1>
+    <div class="topbar-meta">
+      
+      <a href="&lt;https://github.com/railsstudent/devfest-2026-workshop&gt;" target="_blank" rel="noopener">GitHub Repo</a>
+    </div>
+  </header>
+
+  <main class="layout">
+    <nav class="sidebar" aria-label="Workshop Steps">
+      
+        <button class="step-nav-item active" data-step="0" type="button">
+          <span class="step-num">1</span>
+          <span class="step-label">Overview and Prerequisites</span>
+        </button>
+
+        <button class="step-nav-item" data-step="1" type="button">
+          <span class="step-num">2</span>
+          <span class="step-label">Part 1: Create a Firebase Project and Web App</span>
+        </button>
+
+        <button class="step-nav-item" data-step="2" type="button">
+          <span class="step-num">3</span>
+          <span class="step-label">Part 1: Enable Firebase AI Logic and App Check</span>
+        </button>
+
+        <button class="step-nav-item" data-step="3" type="button">
+          <span class="step-num">4</span>
+          <span class="step-label">Part 1: Assign Billing Account to the Firebase Project</span>
+        </button>
+
+        <button class="step-nav-item" data-step="4" type="button">
+          <span class="step-num">5</span>
+          <span class="step-label">Part 1: Create Server Prompt Templates</span>
+        </button>
+
+        <button class="step-nav-item" data-step="5" type="button">
+          <span class="step-num">6</span>
+          <span class="step-label">Part 1: Configure Firebase Remote Config</span>
+        </button>
+
+        <button class="step-nav-item" data-step="6" type="button">
+          <span class="step-num">7</span>
+          <span class="step-label">Part 2: Angular Application Integration</span>
+        </button>
+    </nav>
+
+    <div class="content-area">
+      
+      <section class="step-panel active" data-step="0">
+        <div class="step-header">
+          <h2>1. Overview and Prerequisites</h2>
+          
+        </div>
+        <div class="step-body">
+          <p>Duration: 1</p>
+<p>Welcome to the <strong>Build an Angular Web App with Firebase AI Logic Server Prompt Templates</strong> workshop! This workshop is split into two parts:</p>
+<ol>
+<li><strong>Part 1: Firebase Configuration</strong> — Set up a Firebase project, configure billing with Google Cloud Credits, enable Firebase AI Logic (in template-only mode) and App Check, create Server Prompt Templates, and configure Firebase Remote Config.</li>
+<li><strong>Part 2: Angular Web App Integration</strong> — Connect an Angular application to Firebase AI Logic and Remote Config to invoke your Server Prompt Templates securely from the client.</li>
+</ol>
+<h3>Prerequisites</h3>
+<ul>
+<li><strong>Node.js 24+</strong> installed (<a href="https://nodejs.org/" target="_blank" rel="noopener">https://nodejs.org/</a>)</li>
+<li>A <strong>Gmail / Google account</strong></li>
+<li><strong>Redeem the Google Cloud Credit</strong> provided for this workshop before starting the Firebase billing setup.</li>
+</ul>
+
+        </div>
+      </section>
+
+      <section class="step-panel" data-step="1">
+        <div class="step-header">
+          <h2>2. Part 1: Create a Firebase Project and Web App</h2>
+          
+        </div>
+        <div class="step-body">
+          <p>Duration: 5</p>
+<ol>
+<li>Go to the Firebase Console at <a href="https://console.firebase.google.com/u/0/" target="_blank" rel="noopener">https://console.firebase.google.com/u/0/</a> to create a new Firebase project.</li>
+<li>Once your project is created, add a new <strong>Web App</strong> (<code>&lt;/&gt;</code>) to your Firebase project from the Project Overview page.</li>
+</ol>
+<img src="images/firebase-console.png" alt="Create a Firebase project and add a web app in Firebase Console" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" />
+        </div>
+      </section>
+
+      <section class="step-panel" data-step="2">
+        <div class="step-header">
+          <h2>3. Part 1: Enable Firebase AI Logic and App Check</h2>
+          
+        </div>
+        <div class="step-body">
+          <p>Duration: 10</p>
+<h3>1. Enable Firebase AI Logic</h3>
+<ol>
+<li>In the Firebase Console sidebar, navigate to <strong>Firebase -&gt; AI Services -&gt; AI Logic -&gt; Gemini Developer API</strong>.</li>
+<li>Enable the <strong>Gemini Developer API</strong> provider.</li>
+<li>Enable <strong>template-only mode</strong> so the client app can only execute pre-registered Server Prompt Templates.</li>
+</ol>
+<h3>2. Enable App Check</h3>
+<ol>
+<li>In the Firebase Console sidebar, navigate to <strong>Firebase -&gt; Security -&gt; App Check</strong>.</li>
+<li>Click <strong>Set up</strong> and configure the following protections:<ul>
+<li><strong>Baseline protection</strong>: Select <strong>Enforced</strong></li>
+<li><strong>Replay protection</strong>: Select <strong>Enforced</strong></li>
+<li><strong>Confirmation</strong>: Confirm and save your App Check configuration</li>
+</ul>
+</li>
+</ol>
+
+        </div>
+      </section>
+
+      <section class="step-panel" data-step="3">
+        <div class="step-header">
+          <h2>4. Part 1: Assign Billing Account to the Firebase Project</h2>
+          
+        </div>
+        <div class="step-body">
+          <p>Duration: 5</p>
+<p>To use Gemini models and features in Firebase AI Logic, link your redeemed Google Cloud Credits billing account to your Firebase project:</p>
+<ol>
+<li>Navigate to the Google Cloud Billing Projects page at <a href="https://console.cloud.google.com/billing/projects" target="_blank" rel="noopener">https://console.cloud.google.com/billing/projects</a>.</li>
+<li>Locate your Firebase project, click the <strong>three dots</strong> (<code>⋮</code>) action menu at the end of the row, and choose <strong>Change billing</strong>.</li>
+<li>Change the billing account to your <strong>Google Cloud Credits</strong> billing account and confirm.</li>
+</ol>
+
+        </div>
+      </section>
+
+      <section class="step-panel" data-step="4">
+        <div class="step-header">
+          <h2>5. Part 1: Create Server Prompt Templates</h2>
+          
+        </div>
+        <div class="step-body">
+          <p>Duration: 15</p>
+<p>In the Firebase Console, navigate to <strong>Firebase AI Logic -&gt; Prompt Templates</strong>:</p>
+<ol>
+<li>Click <strong>Create Template -&gt; Template</strong>.</li>
+<li>Under <strong>Gemini API Provider</strong>, choose <strong>Gemini Developer API</strong> from the dropdown.</li>
+</ol>
+<p>You will create three Server Prompt Templates. For each template, copy the code blocks below into the corresponding sections in the Firebase Console UI:</p>
+<ul>
+<li>Copy the <strong>Configuration</strong> (<code>yaml</code>) block into the <strong>Configuration</strong> section.</li>
+<li>Copy the <strong>Prompt text</strong> block into the <strong>Prompt text</strong> section.</li>
+<li>Copy the <strong>Prompt input</strong> (<code>json</code>) block into the <strong>Prompt input</strong> section.</li>
+</ul>
+<hr>
+<h3>a) Country Animal Guide (<code>country-animal-guide-v0-0-1</code>)</h3>
+<ul>
+<li><strong>Configuration</strong>:</li>
+</ul>
+<pre><code class="language-yaml">model: &quot;gemini-nano-banana-2.1&quot;
+config:
+  candidateCount: 1
+  thinkingLevel: MINIMAL
+  includeThoughts: false
+tools:
+  - googleSearch
+responseModalities: [&quot;IMAGE&quot;]
+location: global
+input:
+  schema:
+    country: string, The country name.
+</code></pre>
+<ul>
+<li><strong>Prompt text</strong>:</li>
+</ul>
+<pre><code class="language-text">A hyper-realistic 3D animal guide infographic poster for {{country}}. The country shape is rendered as a raised, textured terrain map floating on a clean light gray surface. The most iconic native wild animals of {{country}} are placed as highly detailed, photorealistic 3D sculpted miniature figures at their correct geographic habitats across the map — each animal must be anatomically accurate, instantly recognizable, and true to its natural environment. The terrain biomes change across the map to reflect each animal’s habitat. White paths connect the key regions across the terrain. Around the map, floating 3D decorative props are scattered: a pair of binoculars, a nature field journal, animal paw prints, a magnifying glass, and a postage stamp seal reading &quot;Animal Guide to {{country}}&quot; The national flag of {{country}} is shown as a small realistic folded flag in the upper right corner. Each animal has a bold black label on the map, and beside the map, each animal has a neat checklist showing: common name, scientific name, conservation status, and habitat region — in clean sans-serif typography. A large bold title at the top reads: “ANIMAL GUIDE TO {{country}}&quot; in black uppercase typography with the word {{country}} in heavy bold. The overall aesthetic is premium editorial nature content — soft studio lighting, photorealistic 3D render, white/light gray background, clean layout.
+
+Apply this aspect ratio to the image: 1:1.
+Apply this resolution to the image: 512.
+</code></pre>
+<ul>
+<li><strong>Prompt input</strong>:</li>
+</ul>
+<pre><code class="language-json">{
+  &quot;country&quot;: &quot;Malaysia&quot;
+}
+</code></pre>
+<p><strong>Verify and Test:</strong></p>
+<ol>
+<li>Choose <strong>Gemini Developer API</strong> from the <strong>Gemini API Provider</strong> dropdown.</li>
+<li>Click <strong>Create formatted test request</strong> to verify the request.</li>
+<li>Click <strong>Run Prompt test</strong> to get the result.</li>
+</ol>
+<hr>
+<h3>b) Country Food Guide (<code>country-food-guide-v-0-0-1</code>)</h3>
+<ul>
+<li><strong>Configuration</strong>:</li>
+</ul>
+<pre><code class="language-yaml">model: &quot;gemini-nano-banana-2.1&quot;
+config:
+  candidateCount: 1
+  thinkingConfig:
+    thinkingLevel: MINIMAL
+    includeThoughts: false
+tools:
+  - googleSearch
+responseModalities: [&quot;IMAGE&quot;]
+location: global
+input:
+  schema:
+    country: string, The country name.
+</code></pre>
+<ul>
+<li><strong>Prompt text</strong>:</li>
+</ul>
+<pre><code class="language-text">Vintage editorial food poster, &quot;Top 9 Dishes of {{country}}&quot;, aged parchment beige background, 3x3 grid layout of hyper-realistic photographed dishes each on a rustic ceramic plate, bold black and dark red serif typography for title, large country name in distressed slab-serif font, national flag top-left corner, iconic country landmarks illustrated in vintage engraving style as decorative header and footer borders, small cultural icon illustrations in corners (traditional figures, instruments, architecture), diamond ornamental dividers between sections, bold dish name caption beneath each photo, warm golden lighting on food, ultra-detailed, editorial infographic style.
+
+Apply this aspect ratio to the image: 2:3
+Apply this resolution to the image: 512.
+</code></pre>
+<ul>
+<li><strong>Prompt input</strong>:</li>
+</ul>
+<pre><code class="language-json">{
+  &quot;country&quot;: &quot;Canada&quot;
+}
+</code></pre>
+<p><strong>Verify and Test:</strong></p>
+<ol>
+<li>Choose <strong>Gemini Developer API</strong> from the <strong>Gemini API Provider</strong> dropdown.</li>
+<li>Click <strong>Create formatted test request</strong> to verify the request.</li>
+<li>Click <strong>Run Prompt test</strong> to get the result.</li>
+</ol>
+<hr>
+<h3>c) Summarize YouTube URL (<code>summarize-youtube-url-v-0-0-1</code>)</h3>
+<ul>
+<li><strong>Configuration</strong>:</li>
+</ul>
+<pre><code class="language-yaml">model: &quot;gemini-3.8-flash&quot;
+config:
+  candidateCount: 1
+  thinkingConfig:
+    thinkingLevel: high
+    includeThoughts: false
+location: global
+responseModalities: [&quot;TEXT&quot;]
+input:
+  schema:
+     url: string
+     mime_type: string
+output:
+  format: json
+  schema:
+    summary: string, summary of the URL
+    topic?: string, topic of the URL
+    tags(array, list of tags relevant to the video): string
+</code></pre>
+<ul>
+<li><strong>Prompt text</strong> (contains system instruction and user prompt):</li>
+</ul>
+<pre><code class="language-text">{{role &quot;system&quot;}}
+You are an expert at summarizing videos, finding the topic, and generating tags relevant to their content. The user provides the URL and MIME type below. 
+
+{{role &quot;user&quot;}}
+{{media url=&quot;url&quot; mimetype=&quot;mime_type&quot;}}
+</code></pre>
+<ul>
+<li><strong>Prompt input</strong>:</li>
+</ul>
+<pre><code class="language-json">{
+  &quot;mime_type&quot;: &quot;video/mp4&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=BHGTA6ZEls4&quot;
+}
+</code></pre>
+<p><strong>Verify and Test:</strong></p>
+<ol>
+<li>Choose <strong>Gemini Developer API</strong> from the <strong>Gemini API Provider</strong> dropdown.</li>
+<li>Click <strong>Create formatted test request</strong> to verify the request.</li>
+<li>Click <strong>Run Prompt test</strong> to get the result.</li>
+</ol>
+
+        </div>
+      </section>
+
+      <section class="step-panel" data-step="5">
+        <div class="step-header">
+          <h2>6. Part 1: Configure Firebase Remote Config</h2>
+          
+        </div>
+        <div class="step-body">
+          <p>Duration: 5</p>
+<p>In the Firebase Console sidebar, navigate to <strong>Firebase -&gt; Remote Config</strong> and add two parameters to store your Server Prompt Template IDs:</p>
+<h3>a) <code>summarizeTemplateId</code></h3>
+<ul>
+<li><strong>Parameter name (key)</strong>: <code>summarizeTemplateId</code></li>
+<li><strong>Data type</strong>: <code>String</code></li>
+<li><strong>Description</strong>: <code>Summarize Template Id</code></li>
+<li><strong>Default value</strong>: <code>summarize-youtube-url-v-0-0-1</code></li>
+</ul>
+<h3>b) <code>countryTemplateId</code></h3>
+<ul>
+<li><strong>Parameter name (key)</strong>: <code>countryTemplateId</code></li>
+<li><strong>Data type</strong>: <code>String</code></li>
+<li><strong>Description</strong>: <code>Country Prompt Template Id</code></li>
+<li><strong>Default value</strong>: <code>country-food-guide-v-0-0-1</code></li>
+</ul>
+<p>Click <strong>Publish changes</strong> in Firebase Remote Config to make the parameters available to your application.</p>
+
+        </div>
+      </section>
+
+      <section class="step-panel" data-step="6">
+        <div class="step-header">
+          <h2>7. Part 2: Angular Application Integration</h2>
+          
+        </div>
+        <div class="step-body">
+          <p>Duration: 15</p>
+<p>With the Firebase project, AI Logic Server Prompt Templates, App Check, and Remote Config parameters configured, you are ready to connect the Angular web application in Part 2 of this workshop.</p>
+
+        </div>
+      </section>
+      <div class="step-footer">
+        <button id="prev-btn" class="nav-btn" type="button">Previous</button>
+        <button id="next-btn" class="nav-btn primary" type="button">Next</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const navItems = Array.from(document.querySelectorAll('.step-nav-item'));
+      const panels = Array.from(document.querySelectorAll('.step-panel'));
+      const prevBtn = document.getElementById('prev-btn');
+      const nextBtn = document.getElementById('next-btn');
+      let current = 0;
+
+      function showStep(index, updateHash = true) {
+        if (index < 0 || index >= panels.length) return;
+        current = index;
+        navItems.forEach((el, i) => el.classList.toggle('active', i === index));
+        panels.forEach((el, i) => el.classList.toggle('active', i === index));
+        prevBtn.disabled = index === 0;
+        nextBtn.disabled = index === panels.length - 1;
+        if (updateHash) {
+          history.replaceState(null, '', '#' + index);
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      navItems.forEach((btn, i) => btn.addEventListener('click', () => showStep(i)));
+      prevBtn.addEventListener('click', () => showStep(current - 1));
+      nextBtn.addEventListener('click', () => showStep(current + 1));
+
+      // Wrap every <pre> block and add a one-click Copy button
+      document.querySelectorAll('.step-body pre').forEach((pre) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-wrapper';
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+
+        const copyBtn = document.createElement('button');
+        copyBtn.type = 'button';
+        copyBtn.className = 'copy-btn';
+        copyBtn.textContent = 'Copy';
+        copyBtn.addEventListener('click', async () => {
+          const text = pre.innerText;
+          await navigator.clipboard.writeText(text);
+          copyBtn.textContent = 'Copied!';
+          setTimeout(() => (copyBtn.textContent = 'Copy'), 1500);
+        });
+        wrapper.appendChild(copyBtn);
+      });
+
+      const initialHash = Number(window.location.hash.replace('#', ''));
+      showStep(Number.isInteger(initialHash) && initialHash >= 0 && initialHash < panels.length ? initialHash : 0, false);
+    })();
+  </script>
+</body>
+</html>

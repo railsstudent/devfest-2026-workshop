@@ -275,27 +275,27 @@
 
         <button class="step-nav-item" data-step="3" type="button">
           <span class="step-num">4</span>
-          <span class="step-label">Part 1: Enable App Check</span>
+          <span class="step-label">Part 1: Assign Billing Account to the Firebase Project</span>
         </button>
 
         <button class="step-nav-item" data-step="4" type="button">
           <span class="step-num">5</span>
-          <span class="step-label">Part 1: Assign Billing Account to the Firebase Project</span>
+          <span class="step-label">Part 1: Create Server Prompt Templates</span>
         </button>
 
         <button class="step-nav-item" data-step="5" type="button">
           <span class="step-num">6</span>
-          <span class="step-label">Part 1: Create Server Prompt Templates</span>
+          <span class="step-label">Part 1: Configure Firebase Remote Config</span>
         </button>
 
         <button class="step-nav-item" data-step="6" type="button">
           <span class="step-num">7</span>
-          <span class="step-label">Part 1: Configure Firebase Remote Config</span>
+          <span class="step-label">Part 2: Angular Application Integration</span>
         </button>
 
         <button class="step-nav-item" data-step="7" type="button">
           <span class="step-num">8</span>
-          <span class="step-label">Part 2: Angular Application Integration</span>
+          <span class="step-label">Part 1: Enable Debug Mode in App Check</span>
         </button>
     </nav>
 
@@ -352,7 +352,7 @@
           
         </div>
         <div class="step-body">
-          <p>Duration: 1 minutes</p>
+          <p>Duration: 5 minutes</p>
 <h3>Enable Firebase AI Logic</h3>
 <ol>
 <li>In the Firebase Console sidebar, navigate to <strong>Firebase -&gt; AI Services -&gt; AI Logic -&gt; Get Started</strong>.</li>
@@ -369,45 +369,26 @@
 
       <section class="step-panel" data-step="3">
         <div class="step-header">
-          <h2>4. Part 1: Enable App Check</h2>
+          <h2>4. Part 1: Assign Billing Account to the Firebase Project</h2>
           
         </div>
         <div class="step-body">
-          <p>Duration: 5 minutes</p>
-<h3>Enable App Check</h3>
+          <p>Duration: 2 minutes</p>
+<p>To use Gemini models and features in Firebase AI Logic, link your redeemed Google Cloud Credits billing account to your Firebase project:</p>
 <ol>
-<li>In the Firebase Console sidebar, navigate to <strong>Firebase -&gt; Security -&gt; App Check</strong>.</li>
-<li>Click <strong>Set up</strong> and configure the following protections:<ul>
-<li><strong>Baseline protection</strong>: Select <strong>Enforced</strong></li>
-<li><strong>Replay protection</strong>: Select <strong>Enforced</strong></li>
-<li><strong>Confirmation</strong>: Confirm and save your App Check configuration</li>
-</ul>
-</li>
+<li>Navigate to the Google Cloud Billing Projects page at <a href="https://console.cloud.google.com/billing/projects" target="_blank" rel="noopener">https://console.cloud.google.com/billing/projects</a>.</li>
+<li>Locate your Firebase project, click the <strong>three dots</strong> (<code>⋮</code>) action menu at the end of the row, and choose <strong>Change billing</strong>.</li>
 </ol>
-
+<img src="images/assign-the-billing-account.png" alt="Assign the billing account in the Google Cloud Console" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /><ol start="3">
+<li>Change the billing account to your <strong>Google Cloud Credits</strong> billing account and confirm.</li>
+</ol>
+<img src="images/set-the-billing-account.png" alt="Set the billing account" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" />
         </div>
       </section>
 
       <section class="step-panel" data-step="4">
         <div class="step-header">
-          <h2>5. Part 1: Assign Billing Account to the Firebase Project</h2>
-          
-        </div>
-        <div class="step-body">
-          <p>Duration: 5</p>
-<p>To use Gemini models and features in Firebase AI Logic, link your redeemed Google Cloud Credits billing account to your Firebase project:</p>
-<ol>
-<li>Navigate to the Google Cloud Billing Projects page at <a href="https://console.cloud.google.com/billing/projects" target="_blank" rel="noopener">https://console.cloud.google.com/billing/projects</a>.</li>
-<li>Locate your Firebase project, click the <strong>three dots</strong> (<code>⋮</code>) action menu at the end of the row, and choose <strong>Change billing</strong>.</li>
-<li>Change the billing account to your <strong>Google Cloud Credits</strong> billing account and confirm.</li>
-</ol>
-
-        </div>
-      </section>
-
-      <section class="step-panel" data-step="5">
-        <div class="step-header">
-          <h2>6. Part 1: Create Server Prompt Templates</h2>
+          <h2>5. Part 1: Create Server Prompt Templates</h2>
           
         </div>
         <div class="step-body">
@@ -553,9 +534,9 @@ You are an expert at summarizing videos, finding the topic, and generating tags 
         </div>
       </section>
 
-      <section class="step-panel" data-step="6">
+      <section class="step-panel" data-step="5">
         <div class="step-header">
-          <h2>7. Part 1: Configure Firebase Remote Config</h2>
+          <h2>6. Part 1: Configure Firebase Remote Config</h2>
           
         </div>
         <div class="step-body">
@@ -580,14 +561,36 @@ You are an expert at summarizing videos, finding the topic, and generating tags 
         </div>
       </section>
 
-      <section class="step-panel" data-step="7">
+      <section class="step-panel" data-step="6">
         <div class="step-header">
-          <h2>8. Part 2: Angular Application Integration</h2>
+          <h2>7. Part 2: Angular Application Integration</h2>
           
         </div>
         <div class="step-body">
           <p>Duration: 15</p>
 <p>With the Firebase project, AI Logic Server Prompt Templates, App Check, and Remote Config parameters configured, you are ready to connect the Angular web application in Part 2 of this workshop.</p>
+
+        </div>
+      </section>
+
+      <section class="step-panel" data-step="7">
+        <div class="step-header">
+          <h2>8. Part 1: Enable Debug Mode in App Check</h2>
+          
+        </div>
+        <div class="step-body">
+          <p>Duration: 5 minutes</p>
+<h3>Enable App Check</h3>
+<ol>
+<li>In the Firebase Console sidebar, navigate to <strong>Firebase -&gt; Security -&gt; App Check</strong>.</li>
+<li>Find <strong>Firebase AI Logic</strong> and click the <strong>Register an app</strong> link.</li>
+<li>Click <strong>Set up</strong> and configure the following protections:<ul>
+<li><strong>Baseline protection</strong>: Select <strong>Enforced</strong></li>
+<li><strong>Replay protection</strong>: Select <strong>Enforced</strong></li>
+<li><strong>Confirmation</strong>: Confirm and save your App Check configuration</li>
+</ul>
+</li>
+</ol>
 
         </div>
       </section>

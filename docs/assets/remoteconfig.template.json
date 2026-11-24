@@ -1,0 +1,18 @@
+{ 
+    "parameters": {                                                                                        
+        "summarizeTemplateId": {                                                                             
+            "defaultValue": {                                                                                  
+            "value": "summarize-youtube-url-v-0-0-1"                                                         
+            },
+            "description": "Summarize Template Id",                                                            
+            "valueType": "STRING"
+        },
+        "countryTemplateId": {
+            "defaultValue": {
+            "value": "country-food-guide-v-0-0-1"
+            },
+            "description": "Country Prompt Template Id",
+            "valueType": "STRING"
+        }
+    }
+}

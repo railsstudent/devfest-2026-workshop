@@ -100,7 +100,7 @@ function renderHtml({ meta, steps, totalDuration }) {
       <section class="step-panel${i === 0 ? ' active' : ''}" data-step="${i}">
         <div class="step-header">
           <h2>${i + 1}. ${formatHeadingHtml(s.label)}</h2>
-          ${s.duration ? `<span class="step-duration">${s.duration} min</span>` : ''}
+          ${s.duration ? `<span class="step-duration">Estimated duration: ${s.duration} min</span>` : ''}
         </div>
         <div class="step-body">
           ${s.bodyHtml}
@@ -241,9 +241,9 @@ function renderHtml({ meta, steps, totalDuration }) {
     }
     .step-header {
       display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 16px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
       padding-bottom: 14px;
       margin-bottom: 20px;
       border-bottom: 1px solid var(--border);
@@ -254,11 +254,12 @@ function renderHtml({ meta, steps, totalDuration }) {
       font-weight: 600;
     }
     .step-duration {
-      flex-shrink: 0;
+      display: inline-block;
       font-size: 0.85rem;
-      color: var(--muted);
-      background: var(--bg);
-      padding: 3px 10px;
+      font-weight: 600;
+      color: var(--primary);
+      background: var(--primary-soft);
+      padding: 4px 12px;
       border-radius: 999px;
     }
     .step-body h3 {

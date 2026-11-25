@@ -116,7 +116,7 @@ To use Gemini models and features in Firebase AI Logic, link your redeemed Googl
 
 ## Part 1: Create Server Prompt Templates
 
-Duration: 15
+Duration: 10
 
 In the Firebase Console sidebar, navigate to **Firebase -> AI Logic -> Prompt templates**:
 
@@ -546,11 +546,9 @@ Firebase App Check debug token: <app check debug token>
 
 Copy `<app check debug token>` and paste it to a temporary location first.
 
-<img src="images/app-check-manage-debug-token.png" alt="Register app check debug token" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" />
-
 4. In the **Firebase Console**, go to **Firebase -> App Check -> Apps -> Your apps**, click the **`⋮` (three dots)** menu on the right side of your web app row *(this menu is easy to miss)*, and select **Manage debug tokens** -> **Add debug token**.
 
-*(Placeholder: add screenshot of App Check -> Apps -> `⋮` -> Manage debug tokens.)*
+<img src="images/app-check-manage-debug-token.png" alt="Register app check debug token" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" />
 
 5. Input a recognizable name (for example, `Local Dev`), paste `<app check debug token>` into **Value**, and click **Save**.
 
@@ -565,9 +563,8 @@ Duration: 2
 1. Paste that exact registered UUID into `APP_FIREBASE_APPCHECK_DEBUG_TOKEN` in `firebase/.env`:
 
 ```env
-APP_FIREBASE_PROJECT_ID="<Firebase Project ID>"
-APP_FIREBASE_WEB_APP_NAME="<Firebase Web App Display Name>"
-APP_FIREBASE_APPCHECK_DEBUG_TOKEN="12345678-90ab-cdef-1234-567890abcdef"
+APP_FIREBASE_WEB_APP_NAME="<App nickname>"
+APP_FIREBASE_APPCHECK_DEBUG_TOKEN="<app check debug token>"
 ```
 
 2. Regenerate `public/firebase.config.json` so `"appCheckDebugToken"` contains your registered UUID, then restart the emulator:
@@ -586,52 +583,102 @@ npm run firebase:emulators:start
 
 <!-- ------------------------ -->
 
+## Part 2: Create the Firebase AI Backend in `ConfigService`
+
+Duration: 2
+
+Now that `FirebaseApp` and `AppCheck` are initialized, create the Firebase AI Logic backend instance in `ConfigService` so the rest of your app can access it via `aiBackend`.
+
+1. Open `src/app/core/firebase/config.service.ts`:
+   * At the top of the file, import `getAI` and `GoogleAIBackend` from `'firebase/ai'`:
+
+```typescript
+import { getAI, GoogleAIBackend } from 'firebase/ai';
+```
+
+   * Inside `initialize()` (right below `initializeAppCheck(...)`), initialize `this.#ai`:
+
+```typescript
+    this.#ai = getAI(this.#firebaseApp, {
+      backend: new GoogleAIBackend(),
+      useLimitedUseAppCheckTokens: true,
+    });
+```
+
+> aside positive
+> **Why `GoogleAIBackend` and `useLimitedUseAppCheckTokens`?**
+> * **`new GoogleAIBackend()`**: Connects Firebase AI Logic to the Gemini Developer API backend.
+> * **`useLimitedUseAppCheckTokens: true`**: Requests single-use App Check tokens for AI Logic calls, adding replay protection for sensitive generative AI endpoints.
+
+**What this means:** Initializes your `AI` backend singleton on `ConfigService` with App Check protection enabled, ready for services to call `configService.aiBackend`.
+
+<!-- ------------------------ -->
+
 ## Part 2: Fetch Server Template IDs into `AppRemoteConfig` in `ConfigService`
 
 Duration: 4
 
-Next, update `ConfigService` to fetch your Remote Config parameters and store them in the `remoteConfig` signal (`AppRemoteConfig`).
+Next, update `ConfigService` to fetch your Remote Config parameters and store them in the `#appConfig` signal (`AppRemoteConfig`), which is exposed as the read-only `appConfig` signal.
 
-1. Open `src/app/services/config.service.ts` and complete the second `// TODO` block to import `@/public/remote-config-defaults.json`, initialize `remoteConfig` with those defaults, call `fetchAndActivate`, and update `this.remoteConfig`:
+1. Open `src/app/core/firebase/config.service.ts` and add the Remote Config imports (`remoteConfigDefault`, `isDevMode`, and `firebase/remote-config`):
 
 ```typescript
-// TODO (Step 3): Import the generated Remote Config defaults JSON
-import remoteConfigDefaults from '@/public/remote-config-defaults.json';
-import {
-  fetchAndActivate,
-  getRemoteConfig,
-  getString,
-  RemoteConfig,
-} from 'firebase/remote-config';
+import remoteConfigDefault from '@/public/remote-config-defaults.json';
+import { isDevMode, Service, signal } from '@angular/core';
+import { fetchAndActivate, getRemoteConfig, getString } from 'firebase/remote-config';
+```
 
-// Inside ConfigService:
-  readonly remoteConfig = signal<AppRemoteConfig>({
-    countryTemplateId: remoteConfigDefaults.countryTemplateId,
-    summarizeTemplateId: remoteConfigDefaults.summarizeTemplateId,
-  });
+2. Add the cache-duration constants above `@Service()`:
 
-  private firebaseRemoteConfig?: RemoteConfig;
+```typescript
+const SECONDS = 60;
+const MILLISECONDS = 1000;
+const ONE_HOUR_IN_MILLISECONDS = SECONDS * SECONDS * MILLISECONDS;
+```
 
-  async loadRemoteConfig(): Promise<void> {
-    this.initFirebase();
-    this.firebaseRemoteConfig = getRemoteConfig(this.app);
+3. At the end of `initialize()`, call `await this.loadRemoteConfig();`:
 
-    // Fetch immediately on localhost; use a higher interval in production.
-    this.firebaseRemoteConfig.settings.minimumFetchIntervalMillis =
-      location.hostname === 'localhost' ? 0 : 43_200_000;
+```typescript
+  async initialize(): Promise<void> {
+    // ...omitted...
 
-    this.firebaseRemoteConfig.defaultConfig = remoteConfigDefaults;
-
-    await fetchAndActivate(this.firebaseRemoteConfig);
-
-    this.remoteConfig.set({
-      countryTemplateId: getString(this.firebaseRemoteConfig, 'countryTemplateId'),
-      summarizeTemplateId: getString(this.firebaseRemoteConfig, 'summarizeTemplateId'),
-    });
+    await this.loadRemoteConfig();
   }
 ```
 
-**What this means:** Decouples prompt template versions from your Angular bundle—your app asks Firebase Remote Config which template ID to run instead of hardcoding template names in client code.
+4. Add the `private async loadRemoteConfig()` method to `ConfigService`:
+
+```typescript
+  private async loadRemoteConfig(): Promise<void> {
+    try {
+      const rc = getRemoteConfig(this.app);
+      rc.defaultConfig = remoteConfigDefault;
+      rc.settings.minimumFetchIntervalMillis = isDevMode() ? 0 : ONE_HOUR_IN_MILLISECONDS;
+      await fetchAndActivate(rc);
+      this.#appConfig.set({
+        summarizeTemplateId: getString(rc, 'summarizeTemplateId'),
+        countryTemplateId: getString(rc, 'countryTemplateId'),
+      });
+      console.log(this.#appConfig());
+    } catch (e) {
+      console.warn('Remote Config fetch timed out or failed. Using defaults:', e);
+    }
+  }
+```
+
+5. Open `src/app/app.config.ts` and update `provideAppInitializer` to `await configService.initialize()` so Angular waits for Firebase initialization and Remote Config loading to finish before rendering:
+
+```typescript
+    provideAppInitializer(async () => {
+      const configService = inject(ConfigService);
+      await configService.initialize();
+    }),
+```
+
+**What this means:**
+- **Updating the Angular Signal (`this.#appConfig.set(...)`):** `#appConfig` is an Angular Signal initialized with empty default values (`countryTemplateId: ''`, `summarizeTemplateId: ''`). Calling `this.#appConfig.set(...)` overwrites those default values in the signal with the dynamic template IDs fetched from Remote Config, and any code reading `configService.appConfig()` automatically receives the updated values.
+- **Dev vs. production fetch interval (`minimumFetchIntervalMillis`):** This setting controls how long the browser caches fetched Remote Config values locally before `fetchAndActivate(rc)` makes another network request. In development (`isDevMode()` is `true`), `0` disables the local cache so template ID changes published in the Firebase Console appear on your next page reload. In production (`isDevMode()` is `false`), `ONE_HOUR_IN_MILLISECONDS` caches values in the browser for 1 hour to reduce network requests and avoid rate limits.
+- **Decoupled template versions:** Your Angular app asks Firebase Remote Config which server prompt template ID to run instead of hardcoding template names in client code.
 
 <!-- ------------------------ -->
 

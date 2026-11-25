@@ -251,7 +251,7 @@
     <h1 class="topbar-title">Build an Angular Web App with Firebase AI Logic Server Prompt Templates</h1>
     <div class="topbar-meta">
       
-      <a href="&lt;https://github.com/railsstudent/devfest-2026-workshop&gt;" target="_blank" rel="noopener">GitHub Repo</a>
+      <a href="https://github.com/railsstudent/devfest-2026-workshop" target="_blank" rel="noopener">GitHub Repo</a>
     </div>
   </header>
 
@@ -275,27 +275,27 @@
 
         <button class="step-nav-item" data-step="3" type="button">
           <span class="step-num">4</span>
-          <span class="step-label">Part 1: Assign Billing Account to the Firebase Project</span>
+          <span class="step-label">Part 1: Enable App Check</span>
         </button>
 
         <button class="step-nav-item" data-step="4" type="button">
           <span class="step-num">5</span>
-          <span class="step-label">Part 1: Create Server Prompt Templates</span>
+          <span class="step-label">Part 1: Assign Billing Account to the Firebase Project</span>
         </button>
 
         <button class="step-nav-item" data-step="5" type="button">
           <span class="step-num">6</span>
-          <span class="step-label">Part 1: Configure Firebase Remote Config</span>
+          <span class="step-label">Part 1: Create Server Prompt Templates</span>
         </button>
 
         <button class="step-nav-item" data-step="6" type="button">
           <span class="step-num">7</span>
-          <span class="step-label">Part 2: Angular Application Integration</span>
+          <span class="step-label">Part 1: Configure Firebase Remote Config</span>
         </button>
 
         <button class="step-nav-item" data-step="7" type="button">
           <span class="step-num">8</span>
-          <span class="step-label">Part 1: Enable Debug Mode in App Check</span>
+          <span class="step-label">Part 2: Angular Application Integration</span>
         </button>
     </nav>
 
@@ -307,7 +307,7 @@
           
         </div>
         <div class="step-body">
-          <p>Duration: 1 minute</p>
+          <p>Duration: 1</p>
 <p>Welcome to the <strong>Build an Angular Web App with Firebase AI Logic Server Prompt Templates</strong> workshop! This workshop is split into two parts:</p>
 <ol>
 <li><strong>Part 1: Firebase Configuration</strong> — Set up a Firebase project, configure billing with Google Cloud Credits, enable Firebase AI Logic (in template-only mode) and App Check, create Server Prompt Templates, and configure Firebase Remote Config.</li>
@@ -329,20 +329,21 @@
           
         </div>
         <div class="step-body">
-          <p>Duration: 3 minutes</p>
+          <p>Duration: 3</p>
 <ol>
-<li>Go to the Firebase Console at <a href="https://console.firebase.google.com/u/0/" target="_blank" rel="noopener">https://console.firebase.google.com/u/0/</a> to create a new Firebase project.</li>
+<li><p>Go to the Firebase Console at <a href="https://console.firebase.google.com/u/0/" target="_blank" rel="noopener">https://console.firebase.google.com/u/0/</a> to create a new Firebase project.</p>
+<img src="images/firebase-console.png" alt="Firebase Console" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" />
+</li>
+<li><p>Create a Firebase project, enable Gemini in Firebase, and disable Google Analytics.</p>
+<img src="images/create-a-firebase-project.png" alt="Create a Firebase project in step 1" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /><img src="images/enable-gemini-in-firebase.png" alt="Enable Gemini in Firebase in step 2" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" />
+</li>
+<li><p>Once your project is created, add a new <strong>Web App</strong> (<code>&lt;/&gt;</code>) to your Firebase project from the Project Overview page.</p>
+<img src="images/firebase-web-app-integration.png" alt="Add a web app" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" />
+</li>
+<li><p>After adding Firebase to the web app, a Firebase configuration is created that we will use to initialize a Firebase app in the Angular app.</p>
+<img src="images/add-firebase-to-web-app.png" alt="Add firebase to web app" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /></li>
 </ol>
-<img src="images/firebase-console.png" alt="Firebase Console" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /><ol start="2">
-<li>Create a Firebase project, enable Gemini in Firebase and disable the Google Analytics</li>
-</ol>
-<img src="images/create-a-firebase-project.png" alt="Create a Firebase project in step 1" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /><img src="images/enable-gemini-in-firebase.png" alt="Enable Gemini in Firebase in step 2" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /><img src="images/disable-google-analytics.png" alt="Disable the google analyics in step 3" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /><ol start="3">
-<li>Once your project is created, add a new <strong>Web App</strong> (<code>&lt;/&gt;</code>) to your Firebase project from the Project Overview page.</li>
-</ol>
-<img src="images/firebase-web-app-integration.png" alt="Add a web app" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /><ol start="4">
-<li>After adding Firebase to the web app, a Firebase configuration is created that we will use to initialize a Firebase app in the Angular app.</li>
-</ol>
-<img src="images/add-firebase-to-web-app.png" alt="Add firebase to web app" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" />
+
         </div>
       </section>
 
@@ -352,68 +353,160 @@
           
         </div>
         <div class="step-body">
-          <p>Duration: 3 minutes</p>
+          <p>Duration: 2</p>
 <h3>Enable Firebase AI Logic</h3>
 <ol>
-<li>In the Firebase Console sidebar, navigate to <strong>Firebase -&gt; AI Services -&gt; AI Logic -&gt; Get Started</strong>.</li>
-<li>Enable the <strong>Gemini Developer API</strong> provider. Click the <strong>Get started with this API</strong> button</li>
-</ol>
+<li><p>In the Firebase Console sidebar, navigate to <strong>Firebase -&gt; AI Services -&gt; AI Logic -&gt; Get Started</strong>.</p>
+</li>
+<li><p>Enable the <strong>Gemini Developer API</strong> provider. Click the <strong>Get started with this API</strong> button.</p>
 <img src="images/enable-api.png" alt="Enable Gemini Developer API" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" />
-3. Keep the default settings to enable the API, AI Monitoring, and finish
-4. The overview of **Firebase AI Logic** displays the web app.<img src="images/firebase-ai-logic-enabled.png" alt="Firebase AI Logic enabled" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /><ol start="5">
-<li>Click the <strong>Settings</strong> tab, scroll down to <strong>Enforce template-only mode</strong> to enable <strong>template-only mode</strong> so the client app can only execute pre-registered Server Prompt Templates.</li>
+</li>
+<li><p>Keep the default settings to enable the API, AI Monitoring, and finish.</p>
+</li>
+<li><p>The overview of <strong>Firebase AI Logic</strong> displays the web app.</p>
+<img src="images/firebase-ai-logic-enabled.png" alt="Firebase AI Logic enabled" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" />
+</li>
+<li><p>Click the <strong>Settings</strong> tab, scroll down to <strong>Enforce template-only mode</strong> to enable <strong>template-only mode</strong> so the client app can only execute pre-registered Server Prompt Templates.</p>
+<img src="images/enforce-template-mode-only.png" alt="Enforce Template Mode Only" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /></li>
 </ol>
-<img src="images/enforce-template-mode-only.png" alt="Enforce Template Mode Only" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" />
+
         </div>
       </section>
 
       <section class="step-panel" data-step="3">
         <div class="step-header">
-          <h2>4. Part 1: Assign Billing Account to the Firebase Project</h2>
+          <h2>4. Part 1: Enable App Check</h2>
           
         </div>
         <div class="step-body">
-          <p>Duration: 2 minutes</p>
-<p>To use Gemini models and features in Firebase AI Logic, link your redeemed Google Cloud Credits billing account to your Firebase project:</p>
+          <p>Duration: 2</p>
 <ol>
-<li>Navigate to the Google Cloud Billing Projects page at <a href="https://console.cloud.google.com/billing/projects" target="_blank" rel="noopener">https://console.cloud.google.com/billing/projects</a>.</li>
-<li>Locate your Firebase project, click the <strong>three dots</strong> (<code>⋮</code>) action menu at the end of the row, and choose <strong>Change billing</strong>.</li>
+<li><p>In the Firebase Console sidebar, navigate to <strong>Firebase -&gt; Security -&gt; App Check -&gt; APIs</strong>.</p>
+</li>
+<li><p>Look for <strong>Firebase AI Logic</strong> and expand the accordion item.</p>
+<img src="images/app-check-set-up.png" alt="Set up App Check configuration" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" />
+</li>
+<li><p>Click <strong>Set up</strong> and configure the following protections:</p>
+<ul>
+<li><p><strong>Baseline protection</strong>: Select <strong>Enforced</strong></p>
+<img src="images/app-check-baseline-protection.png" alt="Enforce Baseline Protection" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" />
+</li>
+<li><p><strong>Replay protection</strong>: Select <strong>Enforced</strong></p>
+<img src="images/app-check-replay-protection.png" alt="Enforce Replay Protection" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" />
+</li>
+<li><p><strong>Confirmation</strong>: Confirm and save your App Check configuration.</p>
+</li>
+</ul>
+</li>
 </ol>
-<img src="images/assign-the-billing-account.png" alt="Assign the billing account in the Google Cloud Console" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /><ol start="3">
-<li>Change the billing account to your <strong>Google Cloud Credits</strong> billing account and confirm.</li>
-</ol>
-<img src="images/set-the-billing-account.png" alt="Set the billing account" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" />
+
         </div>
       </section>
 
       <section class="step-panel" data-step="4">
         <div class="step-header">
-          <h2>5. Part 1: Create Server Prompt Templates</h2>
+          <h2>5. Part 1: Assign Billing Account to the Firebase Project</h2>
+          
+        </div>
+        <div class="step-body">
+          <p>Duration: 2</p>
+<p>To use Gemini models and features in Firebase AI Logic, link your redeemed Google Cloud Credits billing account to your Firebase project:</p>
+<ol>
+<li><p>Navigate to the Google Cloud Billing Projects page at <a href="https://console.cloud.google.com/billing/projects" target="_blank" rel="noopener">https://console.cloud.google.com/billing/projects</a>.</p>
+</li>
+<li><p>Locate your Firebase project, click the <strong>three dots</strong> (<code>⋮</code>) action menu at the end of the row, and choose <strong>Change billing</strong>.</p>
+<img src="images/assign-the-billing-account.png" alt="Assign the billing account in the Google Cloud Console" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" />
+</li>
+<li><p>Change the billing account to your <strong>Google Cloud Credits</strong> billing account and confirm.</p>
+<img src="images/set-the-billing-account.png" alt="Set the billing account" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /></li>
+</ol>
+
+        </div>
+      </section>
+
+      <section class="step-panel" data-step="5">
+        <div class="step-header">
+          <h2>6. Part 1: Create Server Prompt Templates</h2>
           
         </div>
         <div class="step-body">
           <p>Duration: 15</p>
-<p>In the Firebase Console, navigate to <strong>Firebase AI Logic -&gt; Prompt Templates</strong>:</p>
-<ol>
-<li>Click <strong>Create Template -&gt; Template</strong>.</li>
-<li>Under <strong>Gemini API Provider</strong>, choose <strong>Gemini Developer API</strong> from the dropdown.</li>
-</ol>
+<p>In the Firebase Console sidebar, navigate to <strong>Firebase -&gt; AI Logic -&gt; Prompt templates</strong>:</p>
 <p>You will create three Server Prompt Templates. For each template, copy the code blocks below into the corresponding sections in the Firebase Console UI:</p>
 <ul>
 <li>Copy the <strong>Configuration</strong> (<code>yaml</code>) block into the <strong>Configuration</strong> section.</li>
 <li>Copy the <strong>Prompt text</strong> block into the <strong>Prompt text</strong> section.</li>
 <li>Copy the <strong>Prompt input</strong> (<code>json</code>) block into the <strong>Prompt input</strong> section.</li>
 </ul>
+<ol>
+<li>Click <strong>Create Template -&gt; Blank Template</strong>.</li>
+</ol>
 <hr>
 <h3>a) Country Animal Guide (<code>country-animal-guide-v0-0-1</code>)</h3>
 <ul>
-<li><strong>Configuration</strong>:</li>
+<li><p><strong>Template Name</strong>: Country Animal Guide</p>
+</li>
+<li><p><strong>Template ID</strong>: country-animal-guide-v0-0-1</p>
+</li>
+<li><p><strong>Configuration</strong>:</p>
+</li>
 </ul>
 <pre><code class="language-yaml">model: &quot;gemini-nano-banana-2.1&quot;
 config:
   candidateCount: 1
-  thinkingLevel: MINIMAL
-  includeThoughts: false
+  thinkingConfig:
+    thinkingLevel: MEDIUM
+    includeThoughts: false
+tools:
+  - googleSearch
+responseModalities: [&quot;IMAGE&quot;]
+location: global
+input:
+  schema:
+    country: string, The country name.
+</code></pre>
+<p>The configuration specifies the model name (Nano Banana 2.1), thinking configuration, Google Search grounding tool, response modalities (image), and input payload.</p>
+<p>The Google Search tool is used to verify the country map outline, national flag, and native animals.
+The input payload is a JSON object with a <code>country</code> property.</p>
+<img src="images/server-template-config.png" alt="YAML configuration of the template" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /><ul>
+<li><strong>Prompt text</strong>:</li>
+</ul>
+<pre><code class="language-text">First, use Google Search to look up and verify: (1) the accurate geographic map outline and national flag of {{country}}, and (2) the most iconic native wild animals of {{country}}, their exact scientific names, natural habitat regions, and current IUCN Red List conservation status. Then, generate a hyper-realistic 3D animal guide infographic poster for {{country}}. The country shape is rendered as a raised, textured terrain map floating on a clean light gray surface. The most iconic native wild animals of {{country}} are placed as highly detailed, photorealistic 3D sculpted miniature figures at their correct geographic habitats across the map — each animal must be anatomically accurate, instantly recognizable, and true to its natural environment. The terrain biomes change across the map to reflect each animal’s habitat. White paths connect the key regions across the terrain. Around the map, floating 3D decorative props are scattered: a pair of binoculars, a nature field journal, animal paw prints, a magnifying glass, and a postage stamp seal reading &quot;Animal Guide to {{country}}&quot; The national flag of {{country}} is shown as a small realistic folded flag in the upper right corner. Each animal has a bold black label on the map, and beside the map, each animal has a neat checklist showing: common name, scientific name, conservation status, and habitat region — in clean sans-serif typography. A large bold title at the top reads: “ANIMAL GUIDE TO {{country}}&quot; in black uppercase typography with the word {{country}} in heavy bold. The overall aesthetic is premium editorial nature content — soft studio lighting, photorealistic 3D render, white/light gray background, clean layout.
+
+Apply this aspect ratio to the image: 1:1.
+Apply this resolution to the image: 512.
+</code></pre>
+<img src="images/server-template-prompt.png" alt="Prompt Text" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /><ul>
+<li><strong>Prompt input</strong>:</li>
+</ul>
+<pre><code class="language-json">{
+  &quot;country&quot;: &quot;Malaysia&quot;
+}
+</code></pre>
+<img src="images/server-template-input.png" alt="Input payload for the prompt" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /><p>Click the <strong>Save template</strong> button to save all the changes.</p>
+<p><strong>Verify and Test:</strong></p>
+<ol>
+<li><p>Click <strong>Create formatted test request</strong> to verify the request.</p>
+</li>
+<li><p>Click <strong>Run Prompt test</strong> to get the result.</p>
+<img src="images/server-template-response.png" alt="Server template test response" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /></li>
+</ol>
+<hr>
+<h3>b) Country Food Guide (<code>country-food-guide-v-0-0-1</code>)</h3>
+<ul>
+<li><p><strong>Template Name</strong>: Country Food Guide</p>
+</li>
+<li><p><strong>Template ID</strong>: country-food-guide-v0-0-1</p>
+</li>
+<li><p><strong>Configuration</strong>:</p>
+</li>
+</ul>
+<pre><code class="language-yaml">model: &quot;gemini-nano-banana-2.1&quot;
+config:
+  candidateCount: 1
+  thinkingConfig:
+    thinkingLevel: MEDIUM
+    includeThoughts: false
 tools:
   - googleSearch
 responseModalities: [&quot;IMAGE&quot;]
@@ -425,9 +518,9 @@ input:
 <ul>
 <li><strong>Prompt text</strong>:</li>
 </ul>
-<pre><code class="language-text">A hyper-realistic 3D animal guide infographic poster for {{country}}. The country shape is rendered as a raised, textured terrain map floating on a clean light gray surface. The most iconic native wild animals of {{country}} are placed as highly detailed, photorealistic 3D sculpted miniature figures at their correct geographic habitats across the map — each animal must be anatomically accurate, instantly recognizable, and true to its natural environment. The terrain biomes change across the map to reflect each animal’s habitat. White paths connect the key regions across the terrain. Around the map, floating 3D decorative props are scattered: a pair of binoculars, a nature field journal, animal paw prints, a magnifying glass, and a postage stamp seal reading &quot;Animal Guide to {{country}}&quot; The national flag of {{country}} is shown as a small realistic folded flag in the upper right corner. Each animal has a bold black label on the map, and beside the map, each animal has a neat checklist showing: common name, scientific name, conservation status, and habitat region — in clean sans-serif typography. A large bold title at the top reads: “ANIMAL GUIDE TO {{country}}&quot; in black uppercase typography with the word {{country}} in heavy bold. The overall aesthetic is premium editorial nature content — soft studio lighting, photorealistic 3D render, white/light gray background, clean layout.
+<pre><code class="language-text">First, use Google Search to look up and verify: (1) the top 9 most iconic traditional dishes of {{country}}, their exact names, and their authentic visual presentation, and (2) the national flag, iconic landmarks, and traditional cultural symbols of {{country}}. Then generate a vintage editorial food poster, &quot;Top 9 Dishes of {{country}}&quot;, aged parchment beige background, 3x3 grid layout of hyper-realistic photographed dishes each on a rustic ceramic plate, bold black and dark red serif typography for title, large country name in distressed slab-serif font, national flag top-left corner, iconic country landmarks illustrated in vintage engraving style as decorative header and footer borders, small cultural icon illustrations in corners (traditional figures, instruments, architecture), diamond ornamental dividers between sections, bold dish name caption beneath each photo, warm golden lighting on food, ultra-detailed, editorial infographic style.
 
-Apply this aspect ratio to the image: 1:1.
+Apply this aspect ratio to the image: 2:3.
 Apply this resolution to the image: 512.
 </code></pre>
 <ul>
@@ -437,65 +530,28 @@ Apply this resolution to the image: 512.
   &quot;country&quot;: &quot;Malaysia&quot;
 }
 </code></pre>
+<p>Click the <strong>Save template</strong> button to save all the changes.</p>
 <p><strong>Verify and Test:</strong></p>
 <ol>
-<li>Choose <strong>Gemini Developer API</strong> from the <strong>Gemini API Provider</strong> dropdown.</li>
-<li>Click <strong>Create formatted test request</strong> to verify the request.</li>
-<li>Click <strong>Run Prompt test</strong> to get the result.</li>
-</ol>
-<hr>
-<h3>b) Country Food Guide (<code>country-food-guide-v-0-0-1</code>)</h3>
-<ul>
-<li><strong>Configuration</strong>:</li>
-</ul>
-<pre><code class="language-yaml">model: &quot;gemini-nano-banana-2.1&quot;
-config:
-  candidateCount: 1
-  thinkingConfig:
-    thinkingLevel: MINIMAL
-    includeThoughts: false
-tools:
-  - googleSearch
-responseModalities: [&quot;IMAGE&quot;]
-location: global
-input:
-  schema:
-    country: string, The country name.
-</code></pre>
-<ul>
-<li><strong>Prompt text</strong>:</li>
-</ul>
-<pre><code class="language-text">Vintage editorial food poster, &quot;Top 9 Dishes of {{country}}&quot;, aged parchment beige background, 3x3 grid layout of hyper-realistic photographed dishes each on a rustic ceramic plate, bold black and dark red serif typography for title, large country name in distressed slab-serif font, national flag top-left corner, iconic country landmarks illustrated in vintage engraving style as decorative header and footer borders, small cultural icon illustrations in corners (traditional figures, instruments, architecture), diamond ornamental dividers between sections, bold dish name caption beneath each photo, warm golden lighting on food, ultra-detailed, editorial infographic style.
-
-Apply this aspect ratio to the image: 2:3
-Apply this resolution to the image: 512.
-</code></pre>
-<ul>
-<li><strong>Prompt input</strong>:</li>
-</ul>
-<pre><code class="language-json">{
-  &quot;country&quot;: &quot;Canada&quot;
-}
-</code></pre>
-<p><strong>Verify and Test:</strong></p>
-<ol>
-<li>Choose <strong>Gemini Developer API</strong> from the <strong>Gemini API Provider</strong> dropdown.</li>
 <li>Click <strong>Create formatted test request</strong> to verify the request.</li>
 <li>Click <strong>Run Prompt test</strong> to get the result.</li>
 </ol>
 <hr>
 <h3>c) Summarize YouTube URL (<code>summarize-youtube-url-v-0-0-1</code>)</h3>
 <ul>
-<li><strong>Configuration</strong>:</li>
+<li><p><strong>Template Name</strong>: Summarize YouTube URL</p>
+</li>
+<li><p><strong>Template ID</strong>: summarize-youtube-url-v-0-0-1</p>
+</li>
+<li><p><strong>Configuration</strong>:</p>
+</li>
 </ul>
 <pre><code class="language-yaml">model: &quot;gemini-3.8-flash&quot;
 config:
-  candidateCount: 1
   thinkingConfig:
-    thinkingLevel: high
+    thinkingLevel: HIGH
     includeThoughts: false
 location: global
-responseModalities: [&quot;TEXT&quot;]
 input:
   schema:
      url: string
@@ -524,9 +580,9 @@ You are an expert at summarizing videos, finding the topic, and generating tags 
   &quot;url&quot;: &quot;https://www.youtube.com/watch?v=BHGTA6ZEls4&quot;
 }
 </code></pre>
+<p>Click the <strong>Save template</strong> button to save all the changes.</p>
 <p><strong>Verify and Test:</strong></p>
 <ol>
-<li>Choose <strong>Gemini Developer API</strong> from the <strong>Gemini API Provider</strong> dropdown.</li>
 <li>Click <strong>Create formatted test request</strong> to verify the request.</li>
 <li>Click <strong>Run Prompt test</strong> to get the result.</li>
 </ol>
@@ -534,63 +590,61 @@ You are an expert at summarizing videos, finding the topic, and generating tags 
         </div>
       </section>
 
-      <section class="step-panel" data-step="5">
-        <div class="step-header">
-          <h2>6. Part 1: Configure Firebase Remote Config</h2>
-          
-        </div>
-        <div class="step-body">
-          <p>Duration: 5</p>
-<p>In the Firebase Console sidebar, navigate to <strong>Firebase -&gt; Remote Config</strong> and add two parameters to store your Server Prompt Template IDs:</p>
-<h3>a) <code>summarizeTemplateId</code></h3>
-<ul>
-<li><strong>Parameter name (key)</strong>: <code>summarizeTemplateId</code></li>
-<li><strong>Data type</strong>: <code>String</code></li>
-<li><strong>Description</strong>: <code>Summarize Template Id</code></li>
-<li><strong>Default value</strong>: <code>summarize-youtube-url-v-0-0-1</code></li>
-</ul>
-<h3>b) <code>countryTemplateId</code></h3>
-<ul>
-<li><strong>Parameter name (key)</strong>: <code>countryTemplateId</code></li>
-<li><strong>Data type</strong>: <code>String</code></li>
-<li><strong>Description</strong>: <code>Country Prompt Template Id</code></li>
-<li><strong>Default value</strong>: <code>country-food-guide-v-0-0-1</code></li>
-</ul>
-<p>Click <strong>Publish changes</strong> in Firebase Remote Config to make the parameters available to your application.</p>
-
-        </div>
-      </section>
-
       <section class="step-panel" data-step="6">
         <div class="step-header">
-          <h2>7. Part 2: Angular Application Integration</h2>
+          <h2>7. Part 1: Configure Firebase Remote Config</h2>
           
         </div>
         <div class="step-body">
-          <p>Duration: 15</p>
-<p>With the Firebase project, AI Logic Server Prompt Templates, App Check, and Remote Config parameters configured, you are ready to connect the Angular web application in Part 2 of this workshop.</p>
+          <p>Duration: 2</p>
+<p>In the Firebase Console sidebar, navigate to <strong>Firebase -&gt; DevOps &amp; Engagement -&gt; Feature Flagging -&gt; Remote Config</strong>. Instead of adding parameters manually one by one, you can upload a JSON template file that defines both Server Prompt Template ID parameters (<code>countryTemplateId</code> and <code>summarizeTemplateId</code>), their <code>STRING</code> data types, descriptions, and default values in a single step.</p>
+<img src="images/remote-config-upload.png" alt="Upload from template" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /><ol>
+<li><p>Download the template file: <a href="assets/remoteconfig.template.json" download="remoteconfig.template.json">Download remoteconfig.template.json</a></p>
+<p>Its contents (shown below for reference) define both parameters:</p>
+</li>
+</ol>
+<pre><code class="language-json">{
+  &quot;parameters&quot;: {
+    &quot;countryTemplateId&quot;: {
+      &quot;defaultValue&quot;: {
+        &quot;value&quot;: &quot;country-food-guide-v-0-0-1&quot;
+      },
+      &quot;description&quot;: &quot;Country Prompt Template Id&quot;,
+      &quot;valueType&quot;: &quot;STRING&quot;
+    },
+    &quot;summarizeTemplateId&quot;: {
+      &quot;defaultValue&quot;: {
+        &quot;value&quot;: &quot;summarize-youtube-url-v-0-0-1&quot;
+      },
+      &quot;description&quot;: &quot;Summarize Template Id&quot;,
+      &quot;valueType&quot;: &quot;STRING&quot;
+    }
+  }
+}
+</code></pre>
+<ol start="2">
+<li>On the Remote Config welcome screen, click <strong>upload template</strong> (below <strong>Create configuration</strong>) and select <code>remoteconfig.template.json</code>. <em>(If your project already has a Remote Config configuration, click the <code>⋮</code> menu -&gt; <strong>Publish from a file</strong> instead.)</em></li>
+<li>Review the imported parameters and click <strong>Publish changes</strong> to make them available to your application.</li>
+</ol>
+<h3>Expected Output</h3>
+<p>After publishing, the Remote Config <strong>Parameters</strong> list displays both parameters with their default Server Prompt Template IDs:</p>
+<ul>
+<li><strong><code>countryTemplateId</code></strong> (<code>String</code>): <code>country-food-guide-v-0-0-1</code> — <em>Country Prompt Template Id</em></li>
+<li><strong><code>summarizeTemplateId</code></strong> (<code>String</code>): <code>summarize-youtube-url-v-0-0-1</code> — <em>Summarize Template Id</em></li>
+</ul>
+<img src="images/remote-config-overview.png" alt="New remote config parameters" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /><p>Your Angular application will fetch these values at runtime so you can switch prompt template versions in Firebase without redeploying the frontend.</p>
 
         </div>
       </section>
 
       <section class="step-panel" data-step="7">
         <div class="step-header">
-          <h2>8. Part 1: Enable Debug Mode in App Check</h2>
+          <h2>8. Part 2: Angular Application Integration</h2>
           
         </div>
         <div class="step-body">
-          <p>Duration: 5 minutes</p>
-<h3>Enable App Check</h3>
-<ol>
-<li>In the Firebase Console sidebar, navigate to <strong>Firebase -&gt; Security -&gt; App Check</strong>.</li>
-<li>Find <strong>Firebase AI Logic</strong> and click the <strong>Register an app</strong> link.</li>
-<li>Click <strong>Set up</strong> and configure the following protections:<ul>
-<li><strong>Baseline protection</strong>: Select <strong>Enforced</strong></li>
-<li><strong>Replay protection</strong>: Select <strong>Enforced</strong></li>
-<li><strong>Confirmation</strong>: Confirm and save your App Check configuration</li>
-</ul>
-</li>
-</ol>
+          <p>Duration: 15</p>
+<p>With the Firebase project, AI Logic Server Prompt Templates, App Check, and Remote Config parameters configured, you are ready to connect the Angular web application in Part 2 of this workshop.</p>
 
         </div>
       </section>

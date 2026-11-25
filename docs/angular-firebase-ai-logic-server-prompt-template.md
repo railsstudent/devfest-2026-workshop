@@ -616,7 +616,7 @@ import { getAI, GoogleAIBackend } from 'firebase/ai';
 
 ## Part 2: Fetch Server Template IDs into `AppRemoteConfig` in `ConfigService`
 
-Duration: 4
+Duration: 2
 
 Next, update `ConfigService` to fetch your Remote Config parameters and store them in the `#appConfig` signal (`AppRemoteConfig`), which is exposed as the read-only `appConfig` signal.
 
@@ -686,51 +686,38 @@ const ONE_HOUR_IN_MILLISECONDS = SECONDS * SECONDS * MILLISECONDS;
 
 Duration: 4
 
-Now implement `AiService`, which uses `FirebaseApp` from `ConfigService` to initialize **Firebase AI Logic** (`getTemplateGenerativeModel`) and exposes a reusable method accepting `templateId` and `params`.
+Now implement `AiService`, which uses `aiBackend` from `ConfigService` (`getTemplateGenerativeModel`) and exposes `generateResponse` and `generateInlineData` for calling server prompt templates.
 
-1. Open `src/app/services/ai.service.ts` and complete the `// TODO` block:
+1. Open `src/app/core/firebase/ai.service.ts`, delete the `eslint-disable-next-line` comments, and replace the bodies of `generateResponse` and `generateInlineData`:
 
 ```typescript
-import { inject, Injectable } from '@angular/core';
-import {
-  GenerateContentResult,
-  getAI,
-  getTemplateGenerativeModel,
-  GoogleAIBackend,
-  TemplateGenerativeModel,
-} from 'firebase/ai';
-import { ConfigService } from './config.service';
+// ...omitted...
 
-@Injectable({ providedIn: 'root' })
-export class AiService {
-  private readonly configService = inject(ConfigService);
-  private templateModel?: TemplateGenerativeModel;
+  async generateResponse(request: TemplateRequest): Promise<Content | undefined> {
+    const result = await this.getTemplateModel().generateContent(request);
+    const response = result.response;
 
-  private async getTemplateModel(): Promise<TemplateGenerativeModel> {
-    if (!this.templateModel) {
-      await this.configService.initFirebase();
-      const ai = getAI(this.configService.app, {
-        backend: new GoogleAIBackend(),
-      });
-      this.templateModel = getTemplateGenerativeModel(ai);
+    const firstContent = (response.candidates || []).find((c) => c.content.parts.length > 0);
+    return firstContent?.content;
+  }
+
+  async generateInlineData(request: TemplateRequest): Promise<GenerativeContentBlob | undefined> {
+    const result = await this.getTemplateModel().generateContent(request);
+    const response = result.response;
+
+    const parts = response.inlineDataParts();
+    if (!parts) {
+      return undefined;
     }
-    return this.templateModel;
-  }
 
-  async generateFromTemplate(
-    templateId: string,
-    params: Record<string, unknown>,
-  ): Promise<GenerateContentResult> {
-    const model = await this.getTemplateModel();
-    return model.generateContent({
-      templateId,
-      templateVariables: params,
-    });
+    const imagePart = parts.find((part) => !!part);
+    return imagePart?.inlineData;
   }
-}
 ```
 
-**What this means:** Centralizes all Gemini calls behind a single reusable method where the client sends only a `templateId` and input parameters—prompts, model settings, and Google Search grounding remain protected on Firebase servers.
+**What this means:**
+- **Centralized template calls:** Both methods accept a `TemplateRequest` (`templateId` and `templateVariables`) so prompts, model settings, and Google Search grounding remain protected on Firebase servers.
+- **`generateResponse` vs. `generateInlineData`:** `generateResponse` returns the first non-empty candidate `Content` for text or structured responses, while `generateInlineData` extracts the first `GenerativeContentBlob` from `inlineDataParts()` for generated images.
 
 <!-- ------------------------ -->
 

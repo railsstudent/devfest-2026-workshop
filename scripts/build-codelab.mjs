@@ -167,8 +167,8 @@ function renderHtml({ meta, steps, totalDuration }) {
     }
     .layout {
       display: grid;
-      grid-template-columns: 290px minmax(0, 1fr);
-      max-width: 1280px;
+      grid-template-columns: 360px minmax(0, 1fr);
+      max-width: 1360px;
       margin: 0 auto;
       gap: 24px;
       padding: 24px;

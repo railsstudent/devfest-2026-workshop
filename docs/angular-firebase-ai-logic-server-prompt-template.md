@@ -353,7 +353,7 @@ In Part 2, the Angular UI is already built for you. Your focus is connecting the
 1. Clone the Angular starter repository and install dependencies:
 
 ```bash
-git clone https://github.com/<your-org>/devfest-2026-angular-ai-logic-starter.git
+git clone https://github.com/railsstudent/devfest-2026-angular-ai-logic-starter.git
 cd devfest-2026-angular-ai-logic-starter
 npm install
 ```
@@ -363,13 +363,13 @@ npm install
 >
 > **Starter vs. Solution:** The `main` branch contains the starter app with `// TODO` markers. If you get stuck, you can inspect the `solution` branch for the complete implementation.
 
-2. Log in to the Firebase CLI and set your Firebase **Project ID** (not the display name) as the `default` project in `.firebaserc`:
+2. Log in to the Firebase CLI and set your Firebase **Project ID** as the `default` project in `.firebaserc`:
 
 ```bash
 npx firebase login
 ```
 
-Open `.firebaserc` and replace `<your-firebase-project-id>` with your Project ID from Part 1:
+To find it in the Firebase Console, go to ⚙️ **Firebase** -> **Settings** -> **General** -> **Project ID**. Open `.firebaserc` and replace `<your-firebase-project-id>` with your Project ID:
 
 ```json
 {
@@ -379,14 +379,16 @@ Open `.firebaserc` and replace `<your-firebase-project-id>` with your Project ID
 }
 ```
 
-3. Copy `firebase/.env.example` to `firebase/.env` and fill in your Web App display name from Part 1:
+3. Copy `firebase/.env.example` to `firebase/.env`:
 
 ```bash
 cp firebase/.env.example firebase/.env
 ```
 
+In the Firebase Console, go to ⚙️ **Firebase** -> **Settings** -> **General** -> **Your apps**, copy the **App nickname**, and assign it to `APP_FIREBASE_WEB_APP_NAME` in `firebase/.env`:
+
 ```env
-APP_FIREBASE_WEB_APP_NAME="<Firebase Web App Display Name>"
+APP_FIREBASE_WEB_APP_NAME="<App nickname>"
 APP_FIREBASE_APPCHECK_DEBUG_TOKEN=""
 ```
 
@@ -449,106 +451,126 @@ Successfully wrote .../public/remote-config-defaults.json
 
 > aside positive
 > **Slow Wi-Fi / CLI Fallback:** If the Firebase CLI scripts time out on venue Wi-Fi, you can create both files manually from the Firebase Console:
-> * **`public/firebase.config.json`**: Open **Project Settings -> General -> Your apps**, select **Config** under **SDK setup and configuration**, copy your `firebaseConfig` object into `"app"`, and add `"appCheckDebugToken": ""`.
-> * **`public/remote-config-defaults.json`**: Open **Remote Config**, click the top-right `⋮` menu -> **Download default values**, select **`.json`**, click **Download file**, and save/rename the downloaded `remote_config_defaults.json` file to `public/remote-config-defaults.json` (note the hyphens).
+> * **`public/firebase.config.json`**: Go to ⚙️ **Firebase** -> **Settings** -> **General** -> **Your apps**, select **Config** under **SDK setup and configuration**, copy your `firebaseConfig` values into `"app"` (using valid JSON double-quoted keys as shown above), and add `"appCheckDebugToken": ""`.
+> * **`public/remote-config-defaults.json`**: Go to **Firebase** -> **DevOps & Engagement** -> **Feature Flagging** -> **Remote Config**, click the top-right `⋮` menu -> **Download default values**, select **`.json`**, click **Download file**, and save/rename the downloaded `remote_config_defaults.json` file to `public/remote-config-defaults.json` (note the hyphens).
 
-**What this means:** Even though Firebase Web SDK keys are public identifiers by design, committing an `apiKey` (`AIzaSy...`) to a repository triggers automated secret-scanning warning emails from GitHub and Google Cloud, and `appCheckDebugToken` is private and must never be committed. Keeping `public/firebase.config.json` in `.gitignore` and generating it locally via script protects your private debug token and avoids noisy scanner alerts, while `npm run config:fetch` syncs `public/remote-config-defaults.json` with your project's Remote Config default values.
+**What this means:** Even though Firebase Web SDK keys are public identifiers by design, committing an `apiKey` (`AIzaSy...`) to a repository triggers automated secret-scanning warning emails from GitHub and Google Cloud. Keeping `public/firebase.config.json` in `.gitignore` and generating it locally via script avoids noisy scanner alerts, while `npm run config:fetch` syncs `public/remote-config-defaults.json` with your project's Remote Config default values.
 
 <!-- ------------------------ -->
 
-## Part 2: Initialize Firebase and App Check Debug Mode in `ConfigService`
+## Part 2: Initialize Firebase in `ConfigService`
+
+Duration: 3
+
+Because your Firebase project enforces **App Check**, initializing Firebase locally happens in three short steps across the next tabs:
+1. Initialize `FirebaseApp` in `ConfigService` and hook it into `app.config.ts`.
+2. Enable `AppCheck` with `ReCaptchaEnterpriseProvider` in debug mode and register your debug token in the Firebase Console.
+3. Save the debug token in `firebase/.env` and regenerate `public/firebase.config.json` (see [Use App Check with the debug provider](https://firebase.google.com/docs/ai-logic/app-check?api=dev)).
+
+1. Open `src/app/core/firebase/config.service.ts`:
+   * At the top of the file, import `firebaseConfig` from `'@/public/firebase.config.json'` (enabled via `"resolveJsonModule": true` in `tsconfig.json`) and `initializeApp` from `'firebase/app'`:
+
+```typescript
+import firebaseConfig from '@/public/firebase.config.json';
+import { initializeApp } from 'firebase/app';
+```
+
+   * Inside `ConfigService` (below `get app()`), add the `initialize()` method:
+
+```typescript
+  initialize(): void {
+    // Prevent double initialization
+    if (this.#firebaseApp) {
+      return;
+    }
+    this.#firebaseApp = initializeApp(firebaseConfig.app);
+  }
+```
+
+2. Open `src/app/app.config.ts`:
+   * At the top of the file, add `inject` and `provideAppInitializer` to the `'@angular/core'` import, and import `ConfigService`:
+
+```typescript
+import { inject, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ConfigService } from './core/firebase/config.service';
+```
+
+   * Inside `appConfig.providers`, add `provideAppInitializer` after `provideRouter(...)` so Angular calls `ConfigService.initialize()` at application startup:
+
+```typescript
+    provideAppInitializer(() => inject(ConfigService).initialize()),
+```
+
+**What this means:** Initializes your `FirebaseApp` singleton once at Angular application startup using the locally generated `public/firebase.config.json`.
+
+<!-- ------------------------ -->
+
+## Part 2: Configure App Check Debug Mode and Register Your Debug Token in `ConfigService`
 
 Duration: 5
 
-Because your Firebase project enforces **App Check**, running locally on `http://localhost:5005` requires registering an **App Check debug token** (see [Use App Check with the debug provider](https://firebase.google.com/docs/ai-logic/app-check?api=dev)).
-
-1. Open `src/app/services/config.service.ts` and complete the first `// TODO` block to import `@/public/firebase.config.json` (enabled via `"resolveJsonModule": true` in `tsconfig.json`), initialize `FirebaseApp`, and configure App Check with debug mode:
+1. Open `src/app/core/firebase/config.service.ts`:
+   * At the top of the file, import `initializeAppCheck` and `ReCaptchaEnterpriseProvider` from `'firebase/app-check'`:
 
 ```typescript
-// TODO (Step 2): Import the generated Firebase configuration JSON
-import firebaseConfig from '@/public/firebase.config.json';
-import { Injectable, signal } from '@angular/core';
-import { FirebaseApp, initializeApp } from 'firebase/app';
-import {
-  AppCheck,
-  CustomProvider,
-  initializeAppCheck,
-} from 'firebase/app-check';
-
-export interface AppRemoteConfig {
-  countryTemplateId: string;
-  summarizeTemplateId: string;
-}
-
-@Injectable({ providedIn: 'root' })
-export class ConfigService {
-  private firebaseApp?: FirebaseApp;
-  private firebaseAppCheck?: AppCheck;
-
-  readonly remoteConfig = signal<AppRemoteConfig>({
-    countryTemplateId: '',
-    summarizeTemplateId: '',
-  });
-
-  get app(): FirebaseApp {
-    if (!this.firebaseApp) {
-      throw new Error('ConfigService has not been initialized yet.');
-    }
-    return this.firebaseApp;
-  }
-
-  initFirebase(): void {
-    if (this.firebaseApp) {
-      return;
-    }
-
-    this.firebaseApp = initializeApp(firebaseConfig.app);
-
-    // Enable App Check debug mode on localhost.
-    // Falls back to `true` when appCheckDebugToken is empty so the SDK logs a token.
-    if (location.hostname === 'localhost') {
-      (self as unknown as Record<string, unknown>)['FIREBASE_APPCHECK_DEBUG_TOKEN'] =
-        firebaseConfig.appCheckDebugToken || true;
-    }
-
-    this.firebaseAppCheck = initializeAppCheck(this.firebaseApp, {
-      provider: new CustomProvider({
-        getToken: () => Promise.reject(new Error('Use App Check debug token on localhost')),
-      }),
-      isTokenAutoRefreshEnabled: true,
-    });
-  }
-}
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check';
 ```
 
-2. Start the Firebase App Hosting emulator (serves the Angular app at `http://localhost:5005`):
+   * Inside `initialize()` (right below `this.#firebaseApp = initializeApp(firebaseConfig.app);`), configure `FIREBASE_APPCHECK_DEBUG_TOKEN` and initialize App Check:
+
+```typescript
+    // configure app check debug token
+    (globalThis as Record<string, unknown>)['FIREBASE_APPCHECK_DEBUG_TOKEN'] =
+      firebaseConfig.appCheckDebugToken || true;
+
+    initializeAppCheck(this.#firebaseApp, {
+      provider: new ReCaptchaEnterpriseProvider('dummyKey'),
+      isTokenAutoRefreshEnabled: true,
+    });
+```
+
+> aside positive
+> **Why does `'dummyKey'` in `ReCaptchaEnterpriseProvider` work here?** `initializeAppCheck()` requires a provider instance such as `ReCaptchaEnterpriseProvider`. However, when `FIREBASE_APPCHECK_DEBUG_TOKEN` is set, the Firebase App Check SDK intercepts token requests and exchanges your local debug token instead of calling reCAPTCHA Enterprise. In a production deployment, you replace `'dummyKey'` with a real reCAPTCHA Enterprise site key created in Google Cloud (see [Get started using App Check with reCAPTCHA Enterprise on web apps](https://firebase.google.com/docs/app-check/web/recaptcha-enterprise-provider) if you are interested in configuring this provider).
+
+2. If your app is currently running, stop it (`Ctrl+C`), then start the Firebase App Hosting emulator to restart the app:
 
 ```bash
 npm run firebase:emulators:start
 ```
 
-3. Open `http://localhost:5005` in your browser, then open **Browser DevTools -> Console**. Copy the UUID from the App Check debug log:
+3. Navigate to `http://localhost:5005` in your browser and open **Chrome DevTools -> Console**. Find the App Check debug log:
 
 ```text
-Firebase App Check debug token: 12345678-90ab-cdef-1234-567890abcdef
+Firebase App Check debug token: <app check debug token>
 ```
 
-*(Placeholder: add screenshot of DevTools Console showing the App Check debug token.)*
+Copy `<app check debug token>` and paste it to a temporary location first.
 
-4. In the **Firebase Console**, go to **Build -> App Check -> Apps**. On the right side of your web app row, click the **`⋮` (three-dots) menu** *(this menu is easy to miss)* and select **Manage debug tokens**.
+<img src="images/app-check-manage-debug-token.png" alt="Register app check debug token" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" />
+
+4. In the **Firebase Console**, go to **Firebase -> App Check -> Apps -> Your apps**, click the **`⋮` (three dots)** menu on the right side of your web app row *(this menu is easy to miss)*, and select **Manage debug tokens** -> **Add debug token**.
 
 *(Placeholder: add screenshot of App Check -> Apps -> `⋮` -> Manage debug tokens.)*
 
-5. Click **Add debug token**, paste the UUID, give it a recognizable name (for example, `Local Dev`), and click **Save**.
+5. Input a recognizable name (for example, `Local Dev`), paste `<app check debug token>` into **Value**, and click **Save**.
 
-6. Paste that exact UUID into `firebase/.env`:
+**What this means:** Authorizes your local debug token in Firebase App Check so Firebase AI Logic accepts requests from your local machine while keeping App Check enforcement active.
+
+<!-- ------------------------ -->
+
+## Part 2: Update `firebase/.env` and Regenerate `public/firebase.config.json`
+
+Duration: 2
+
+1. Paste that exact registered UUID into `APP_FIREBASE_APPCHECK_DEBUG_TOKEN` in `firebase/.env`:
 
 ```env
+APP_FIREBASE_PROJECT_ID="<Firebase Project ID>"
 APP_FIREBASE_WEB_APP_NAME="<Firebase Web App Display Name>"
 APP_FIREBASE_APPCHECK_DEBUG_TOKEN="12345678-90ab-cdef-1234-567890abcdef"
 ```
 
-7. Regenerate `public/firebase.config.json` and restart the emulator:
+2. Regenerate `public/firebase.config.json` so `"appCheckDebugToken"` contains your registered UUID, then restart the emulator:
 
 ```bash
 npm run config:generate
@@ -556,9 +578,11 @@ npm run firebase:emulators:start
 ```
 
 > aside positive
-> **Why assign the actual token instead of leaving `true`?** When `FIREBASE_APPCHECK_DEBUG_TOKEN` is set to `true`, the SDK generates a brand-new random token for every browser profile or incognito window, forcing you to re-register it each time. Assigning the registered UUID lets **all browsers (Chrome, Safari, Firefox, incognito) and restarts share the same debug token**.
+> **What is `"appCheckDebugToken"` and why pin the UUID in `.env`?**
+> * **Why not leave it as `true`?** When `FIREBASE_APPCHECK_DEBUG_TOKEN` is `true`, the SDK generates a brand-new random debug token for every browser profile or incognito window, forcing you to register a new token each time. Assigning your registered UUID to `"appCheckDebugToken"` lets **all browsers (Chrome, Safari, Firefox, incognito) and restarts share the exact same debug token**.
+> * **Why keep it out of Git?** Unlike your Firebase Web `apiKey`, an `appCheckDebugToken` grants verified access to your protected backend resources (including Firebase AI Logic quota) and **must remain private**. Keeping `firebase/.env` and `public/firebase.config.json` in `.gitignore` ensures you never commit your debug token to GitHub.
 
-**What this means:** Firebase AI Logic blocks unverified requests when App Check is enforced; registering and reusing your debug token authorizes your local environment without weakening production security.
+**What this means:** Firebase AI Logic blocks unverified requests when App Check is enforced; initializing `FirebaseApp` + `AppCheck` on startup and pinning your registered debug token in `firebase/.env` authorizes your local environment across browsers without exposing secrets in Git.
 
 <!-- ------------------------ -->
 

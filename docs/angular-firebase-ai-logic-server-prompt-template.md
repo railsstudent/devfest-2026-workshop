@@ -22,8 +22,10 @@ Welcome to the **Build an Angular Web App with Firebase AI Logic Server Prompt T
 ### Prerequisites
 
 * **Node.js 24+** installed (<a href="https://nodejs.org/" target="_blank" rel="noopener">https://nodejs.org/</a>)
+* **Git** installed
 * A **Gmail / Google account**
 * **Redeem the Google Cloud Credit** provided for this workshop before starting the Firebase billing setup.
+* A **stable internet connection** (needed for `npm install`, Firebase CLI scripts, and Gemini AI Logic API calls; manual Firebase Console fallbacks are included if conference Wi-Fi slows down the scripts).
 
 <!-- ------------------------ -->
 
@@ -193,7 +195,7 @@ Click the **Save template** button to save all the changes.
 ### b) Country Food Guide (`country-food-guide-v-0-0-1`)
 
 * **Template Name**: Country Food Guide
-* **Template ID**: country-food-guide-v0-0-1
+* **Template ID**: country-food-guide-v-0-0-1
 
 * **Configuration**:
 
@@ -342,8 +344,586 @@ Your Angular application will fetch these values at runtime so you can switch pr
 
 <!-- ------------------------ -->
 
-## Part 2: Angular Application Integration
+## Part 2: Clone Starter Repo, Link `.firebaserc`, and Run Setup Scripts
 
-Duration: 15
+Duration: 4
 
-With the Firebase project, AI Logic Server Prompt Templates, App Check, and Remote Config parameters configured, you are ready to connect the Angular web application in Part 2 of this workshop.
+In Part 2, the Angular UI is already built for you. Your focus is connecting the Angular services to Firebase—**App Check (Debug Mode)**, **Remote Config**, and **Firebase AI Logic Server Prompt Templates**—and wiring the component generate buttons.
+
+1. Clone the Angular starter repository and install dependencies:
+
+```bash
+git clone https://github.com/<your-org>/devfest-2026-angular-ai-logic-starter.git
+cd devfest-2026-angular-ai-logic-starter
+npm install
+```
+
+> aside positive
+> **No global Angular CLI needed:** `@angular/cli` and `firebase-tools` are included in `devDependencies`, so `npm run firebase:emulators:start` and `npx firebase` work out of the box with **Node.js 24+**.
+>
+> **Starter vs. Solution:** The `main` branch contains the starter app with `// TODO` markers. If you get stuck, you can inspect the `solution` branch for the complete implementation.
+
+2. Log in to the Firebase CLI and set your Firebase **Project ID** (not the display name) as the `default` project in `.firebaserc`:
+
+```bash
+npx firebase login
+```
+
+Open `.firebaserc` and replace `<your-firebase-project-id>` with your Project ID from Part 1:
+
+```json
+{
+  "projects": {
+    "default": "<your-firebase-project-id>"
+  }
+}
+```
+
+3. Copy `firebase/.env.example` to `firebase/.env` and fill in your Web App display name from Part 1:
+
+```bash
+cp firebase/.env.example firebase/.env
+```
+
+```env
+APP_FIREBASE_WEB_APP_NAME="<Firebase Web App Display Name>"
+APP_FIREBASE_APPCHECK_DEBUG_TOKEN=""
+```
+
+Leave `APP_FIREBASE_APPCHECK_DEBUG_TOKEN=""` empty for your first run.
+
+4. Run the setup scripts to generate your Firebase config object and fetch your Remote Config defaults:
+
+```bash
+npm run config:generate
+npm run config:fetch
+```
+
+Here is exactly what each script does on your machine:
+
+* **`npm run config:generate`** (`firebase/scripts/generate-firebase-config.mjs`):
+  * **Reads:** `firebase/.env` and `.firebaserc` (`default` project).
+  * **Runs:** `npx firebase apps:list WEB --json --project default` and `npx firebase apps:sdkconfig WEB <appId> --json --project default` via the Firebase CLI.
+  * **Writes:** `public/firebase.config.json`.
+  * **Expected Output:**
+
+```text
+Success: Loaded .env file
+Querying Firebase CLI for web app: "<Firebase Web App Display Name>"...
+Found Web App "<Firebase Web App Display Name>" with appId: 1:...:web:... Fetching SDK configuration...
+Successfully generated .../public/firebase.config.json
+```
+
+```json
+{
+  "app": {
+    "apiKey": "<your-api-key>",
+    "authDomain": "<your-project-id>.firebaseapp.com",
+    "projectId": "<your-project-id>",
+    "storageBucket": "<your-project-id>.firebasestorage.app",
+    "messagingSenderId": "<your-sender-id>",
+    "appId": "<your-app-id>"
+  },
+  "appCheckDebugToken": ""
+}
+```
+
+* **`npm run config:fetch`** (`firebase/scripts/get-firebase-remote-config.mjs`):
+  * **Reads:** `.firebaserc` (`default` project).
+  * **Runs:** `npx firebase remoteconfig:get --json --project default` via the Firebase CLI.
+  * **Writes:** `public/remote-config-defaults.json`.
+  * **Expected Output:**
+
+```text
+Successfully wrote .../public/remote-config-defaults.json
+```
+
+```json
+{
+  "countryTemplateId": "country-food-guide-v-0-0-1",
+  "summarizeTemplateId": "summarize-youtube-url-v-0-0-1"
+}
+```
+
+*Tip: Calling these Firebase CLI scripts is free, though subject to standard API rate limits—run them manually when needed rather than inside a loop or file watcher.*
+
+> aside positive
+> **Slow Wi-Fi / CLI Fallback:** If the Firebase CLI scripts time out on venue Wi-Fi, you can create both files manually from the Firebase Console:
+> * **`public/firebase.config.json`**: Open **Project Settings -> General -> Your apps**, select **Config** under **SDK setup and configuration**, copy your `firebaseConfig` object into `"app"`, and add `"appCheckDebugToken": ""`.
+> * **`public/remote-config-defaults.json`**: Open **Remote Config**, click the top-right `⋮` menu -> **Download default values**, select **`.json`**, click **Download file**, and save/rename the downloaded `remote_config_defaults.json` file to `public/remote-config-defaults.json` (note the hyphens).
+
+**What this means:** Even though Firebase Web SDK keys are public identifiers by design, committing an `apiKey` (`AIzaSy...`) to a repository triggers automated secret-scanning warning emails from GitHub and Google Cloud, and `appCheckDebugToken` is private and must never be committed. Keeping `public/firebase.config.json` in `.gitignore` and generating it locally via script protects your private debug token and avoids noisy scanner alerts, while `npm run config:fetch` syncs `public/remote-config-defaults.json` with your project's Remote Config default values.
+
+<!-- ------------------------ -->
+
+## Part 2: Initialize Firebase and App Check Debug Mode in `ConfigService`
+
+Duration: 5
+
+Because your Firebase project enforces **App Check**, running locally on `http://localhost:5005` requires registering an **App Check debug token** (see [Use App Check with the debug provider](https://firebase.google.com/docs/ai-logic/app-check?api=dev)).
+
+1. Open `src/app/services/config.service.ts` and complete the first `// TODO` block to import `@/public/firebase.config.json` (enabled via `"resolveJsonModule": true` in `tsconfig.json`), initialize `FirebaseApp`, and configure App Check with debug mode:
+
+```typescript
+// TODO (Step 2): Import the generated Firebase configuration JSON
+import firebaseConfig from '@/public/firebase.config.json';
+import { Injectable, signal } from '@angular/core';
+import { FirebaseApp, initializeApp } from 'firebase/app';
+import {
+  AppCheck,
+  CustomProvider,
+  initializeAppCheck,
+} from 'firebase/app-check';
+
+export interface AppRemoteConfig {
+  countryTemplateId: string;
+  summarizeTemplateId: string;
+}
+
+@Injectable({ providedIn: 'root' })
+export class ConfigService {
+  private firebaseApp?: FirebaseApp;
+  private firebaseAppCheck?: AppCheck;
+
+  readonly remoteConfig = signal<AppRemoteConfig>({
+    countryTemplateId: '',
+    summarizeTemplateId: '',
+  });
+
+  get app(): FirebaseApp {
+    if (!this.firebaseApp) {
+      throw new Error('ConfigService has not been initialized yet.');
+    }
+    return this.firebaseApp;
+  }
+
+  initFirebase(): void {
+    if (this.firebaseApp) {
+      return;
+    }
+
+    this.firebaseApp = initializeApp(firebaseConfig.app);
+
+    // Enable App Check debug mode on localhost.
+    // Falls back to `true` when appCheckDebugToken is empty so the SDK logs a token.
+    if (location.hostname === 'localhost') {
+      (self as unknown as Record<string, unknown>)['FIREBASE_APPCHECK_DEBUG_TOKEN'] =
+        firebaseConfig.appCheckDebugToken || true;
+    }
+
+    this.firebaseAppCheck = initializeAppCheck(this.firebaseApp, {
+      provider: new CustomProvider({
+        getToken: () => Promise.reject(new Error('Use App Check debug token on localhost')),
+      }),
+      isTokenAutoRefreshEnabled: true,
+    });
+  }
+}
+```
+
+2. Start the Firebase App Hosting emulator (serves the Angular app at `http://localhost:5005`):
+
+```bash
+npm run firebase:emulators:start
+```
+
+3. Open `http://localhost:5005` in your browser, then open **Browser DevTools -> Console**. Copy the UUID from the App Check debug log:
+
+```text
+Firebase App Check debug token: 12345678-90ab-cdef-1234-567890abcdef
+```
+
+*(Placeholder: add screenshot of DevTools Console showing the App Check debug token.)*
+
+4. In the **Firebase Console**, go to **Build -> App Check -> Apps**. On the right side of your web app row, click the **`⋮` (three-dots) menu** *(this menu is easy to miss)* and select **Manage debug tokens**.
+
+*(Placeholder: add screenshot of App Check -> Apps -> `⋮` -> Manage debug tokens.)*
+
+5. Click **Add debug token**, paste the UUID, give it a recognizable name (for example, `Local Dev`), and click **Save**.
+
+6. Paste that exact UUID into `firebase/.env`:
+
+```env
+APP_FIREBASE_WEB_APP_NAME="<Firebase Web App Display Name>"
+APP_FIREBASE_APPCHECK_DEBUG_TOKEN="12345678-90ab-cdef-1234-567890abcdef"
+```
+
+7. Regenerate `public/firebase.config.json` and restart the emulator:
+
+```bash
+npm run config:generate
+npm run firebase:emulators:start
+```
+
+> aside positive
+> **Why assign the actual token instead of leaving `true`?** When `FIREBASE_APPCHECK_DEBUG_TOKEN` is set to `true`, the SDK generates a brand-new random token for every browser profile or incognito window, forcing you to re-register it each time. Assigning the registered UUID lets **all browsers (Chrome, Safari, Firefox, incognito) and restarts share the same debug token**.
+
+**What this means:** Firebase AI Logic blocks unverified requests when App Check is enforced; registering and reusing your debug token authorizes your local environment without weakening production security.
+
+<!-- ------------------------ -->
+
+## Part 2: Fetch Server Template IDs into `AppRemoteConfig` in `ConfigService`
+
+Duration: 4
+
+Next, update `ConfigService` to fetch your Remote Config parameters and store them in the `remoteConfig` signal (`AppRemoteConfig`).
+
+1. Open `src/app/services/config.service.ts` and complete the second `// TODO` block to import `@/public/remote-config-defaults.json`, initialize `remoteConfig` with those defaults, call `fetchAndActivate`, and update `this.remoteConfig`:
+
+```typescript
+// TODO (Step 3): Import the generated Remote Config defaults JSON
+import remoteConfigDefaults from '@/public/remote-config-defaults.json';
+import {
+  fetchAndActivate,
+  getRemoteConfig,
+  getString,
+  RemoteConfig,
+} from 'firebase/remote-config';
+
+// Inside ConfigService:
+  readonly remoteConfig = signal<AppRemoteConfig>({
+    countryTemplateId: remoteConfigDefaults.countryTemplateId,
+    summarizeTemplateId: remoteConfigDefaults.summarizeTemplateId,
+  });
+
+  private firebaseRemoteConfig?: RemoteConfig;
+
+  async loadRemoteConfig(): Promise<void> {
+    this.initFirebase();
+    this.firebaseRemoteConfig = getRemoteConfig(this.app);
+
+    // Fetch immediately on localhost; use a higher interval in production.
+    this.firebaseRemoteConfig.settings.minimumFetchIntervalMillis =
+      location.hostname === 'localhost' ? 0 : 43_200_000;
+
+    this.firebaseRemoteConfig.defaultConfig = remoteConfigDefaults;
+
+    await fetchAndActivate(this.firebaseRemoteConfig);
+
+    this.remoteConfig.set({
+      countryTemplateId: getString(this.firebaseRemoteConfig, 'countryTemplateId'),
+      summarizeTemplateId: getString(this.firebaseRemoteConfig, 'summarizeTemplateId'),
+    });
+  }
+```
+
+**What this means:** Decouples prompt template versions from your Angular bundle—your app asks Firebase Remote Config which template ID to run instead of hardcoding template names in client code.
+
+<!-- ------------------------ -->
+
+## Part 2: Implement `AiService` for Server Prompt Templates
+
+Duration: 4
+
+Now implement `AiService`, which uses `FirebaseApp` from `ConfigService` to initialize **Firebase AI Logic** (`getTemplateGenerativeModel`) and exposes a reusable method accepting `templateId` and `params`.
+
+1. Open `src/app/services/ai.service.ts` and complete the `// TODO` block:
+
+```typescript
+import { inject, Injectable } from '@angular/core';
+import {
+  GenerateContentResult,
+  getAI,
+  getTemplateGenerativeModel,
+  GoogleAIBackend,
+  TemplateGenerativeModel,
+} from 'firebase/ai';
+import { ConfigService } from './config.service';
+
+@Injectable({ providedIn: 'root' })
+export class AiService {
+  private readonly configService = inject(ConfigService);
+  private templateModel?: TemplateGenerativeModel;
+
+  private async getTemplateModel(): Promise<TemplateGenerativeModel> {
+    if (!this.templateModel) {
+      await this.configService.initFirebase();
+      const ai = getAI(this.configService.app, {
+        backend: new GoogleAIBackend(),
+      });
+      this.templateModel = getTemplateGenerativeModel(ai);
+    }
+    return this.templateModel;
+  }
+
+  async generateFromTemplate(
+    templateId: string,
+    params: Record<string, unknown>,
+  ): Promise<GenerateContentResult> {
+    const model = await this.getTemplateModel();
+    return model.generateContent({
+      templateId,
+      templateVariables: params,
+    });
+  }
+}
+```
+
+**What this means:** Centralizes all Gemini calls behind a single reusable method where the client sends only a `templateId` and input parameters—prompts, model settings, and Google Search grounding remain protected on Firebase servers.
+
+<!-- ------------------------ -->
+
+## Part 2: Wire `CountryService` and `YoutubeSummarizerService`
+
+Duration: 4
+
+Both feature services read their active template ID from `ConfigService`'s `AppRemoteConfig` signal and pass `(templateId, params)` to `AiService`.
+
+1. Open `src/app/services/country.service.ts` and complete the `// TODO` block:
+
+```typescript
+import { inject, Injectable } from '@angular/core';
+import { AiService } from './ai.service';
+import { ConfigService } from './config.service';
+
+export interface GroundingSource {
+  title: string;
+  uri: string;
+}
+
+export interface CountryGuideResult {
+  text: string;
+  imageDataUrl: string | null;
+  webSearchQueries: string[];
+  sources: GroundingSource[];
+}
+
+@Injectable({ providedIn: 'root' })
+export class CountryService {
+  private readonly aiService = inject(AiService);
+  private readonly configService = inject(ConfigService);
+
+  async generateCountryGuide(
+    country: string,
+    templateId = this.configService.remoteConfig().countryTemplateId,
+  ): Promise<CountryGuideResult> {
+    const result = await this.aiService.generateFromTemplate(templateId, { country });
+
+    const response = result.response;
+    const candidate = response.candidates?.[0];
+
+    let imageDataUrl: string | null = null;
+    for (const part of candidate?.content?.parts ?? []) {
+      if (part.inlineData) {
+        imageDataUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+        break;
+      }
+    }
+
+    const groundingMetadata = candidate?.groundingMetadata;
+    const webSearchQueries = groundingMetadata?.webSearchQueries ?? [];
+    const sources: GroundingSource[] = (groundingMetadata?.groundingChunks ?? [])
+      .map((chunk) => chunk.web)
+      .filter((web): web is { title?: string; uri?: string } => Boolean(web?.uri))
+      .map((web) => ({
+        title: web.title || web.uri || 'Source',
+        uri: web.uri!,
+      }));
+
+    return {
+      text: response.text(),
+      imageDataUrl,
+      webSearchQueries,
+      sources,
+    };
+  }
+}
+```
+
+2. Open `src/app/services/youtube-summarizer.service.ts` and complete the `// TODO` block:
+
+```typescript
+import { inject, Injectable } from '@angular/core';
+import { AiService } from './ai.service';
+import { ConfigService } from './config.service';
+
+@Injectable({ providedIn: 'root' })
+export class YoutubeSummarizerService {
+  private readonly aiService = inject(AiService);
+  private readonly configService = inject(ConfigService);
+
+  async summarize(
+    url: string,
+    templateId = this.configService.remoteConfig().summarizeTemplateId,
+  ): Promise<string> {
+    const result = await this.aiService.generateFromTemplate(templateId, { url });
+    return result.response.text();
+  }
+}
+```
+
+**What this means:** Keeps domain logic modular—each feature service knows its own input shape (`{ country }` or `{ url }`) and passes the active template ID from `ConfigService`'s `AppRemoteConfig` signal into `AiService`.
+
+<!-- ------------------------ -->
+
+## Part 2: Connect Component Generate Buttons to Services
+
+Duration: 3
+
+Now connect the pre-built Angular UI buttons to `CountryService` and `YoutubeSummarizerService`.
+
+1. In the Country Guide component template and TypeScript class, wire the **Generate** button `(click)` event to a component method that calls `CountryService`:
+
+```html
+<button type="button" (click)="onGenerateCountryGuide()" [disabled]="loading()">
+  Generate
+</button>
+```
+
+```typescript
+async onGenerateCountryGuide(): Promise<void> {
+  const templateId = this.configService.remoteConfig().countryTemplateId;
+  const country = this.countrySignal();
+  this.result.set(await this.countryService.generateCountryGuide(country, templateId));
+}
+```
+
+2. In the YouTube Summarizer component template and TypeScript class, wire the **Summarize** button `(click)` event to a component method that calls `YoutubeSummarizerService`:
+
+```html
+<button type="button" (click)="onSummarizeVideo()" [disabled]="loading()">
+  Generate Summary
+</button>
+```
+
+```typescript
+async onSummarizeVideo(): Promise<void> {
+  const templateId = this.configService.remoteConfig().summarizeTemplateId;
+  const url = this.youtubeUrlSignal();
+  this.summary.set(await this.youtubeService.summarize(url, templateId));
+}
+```
+
+**What `(click)="..."` does / What this means:** Clicking the button calls the component handler method, which calls `CountryService` or `YoutubeSummarizerService`—passing the active template ID (from `ConfigService`'s `AppRemoteConfig` signal) and the signal form values (`country` or `url`)—to generate and render the AI response in the UI.
+
+<!-- ------------------------ -->
+
+## Part 2: Test the App on `http://localhost:5005`
+
+Duration: 3
+
+Verify that the entire local stack works end-to-end before testing Remote Config template switching.
+
+1. Open `http://localhost:5005` in your browser.
+2. **Test Country Guide**: Enter a country (for example, `Japan`) and click **Generate**. Verify that the app displays the dish description, the generated food image (`country-food-guide-v-0-0-1`), and the Google Search grounding sources.
+
+*(Placeholder: add screenshot of the Angular app showing the Country Food Guide result.)*
+
+3. **Test YouTube Summarizer**: Paste a public YouTube URL and click **Generate Summary**. Verify that `summarize-youtube-url-v-0-0-1` returns a concise summary.
+
+**What this means:** Confirms the full pipeline—App Check debug token -> Remote Config template IDs -> AI Logic Server Prompt Templates -> grounded multimodal UI output—works together locally.
+
+<!-- ------------------------ -->
+
+## Part 2: Update `countryTemplateId` to Animal Guide and Refresh
+
+Duration: 4
+
+Now update `countryTemplateId` in Remote Config from `country-food-guide-v-0-0-1` to `country-animal-guide-v0-0-1` using the CLI scripts, then refresh the browser to see the AI output change with **zero Angular code changes and zero redeployment**.
+
+1. Pull the live Remote Config template from Firebase into `firebase/remote-config-template.json`:
+
+```bash
+npm run config:pull
+```
+
+* **`npm run config:pull`** (`firebase/scripts/deploy-remote-config.mjs pull`) calls `npx firebase remoteconfig:get --json --project default` and writes `firebase/remote-config-template.json`.
+* **Expected Output:**
+
+```text
+📥 Pulling active Remote Config template from Firebase Cloud...
+✅ Successfully saved live template to: .../firebase/remote-config-template.json
+```
+
+2. Open `firebase/remote-config-template.json` and update `countryTemplateId`'s `defaultValue.value` from `country-food-guide-v-0-0-1` to `country-animal-guide-v0-0-1`:
+
+```json
+"countryTemplateId": {
+  "defaultValue": {
+    "value": "country-animal-guide-v0-0-1"
+  },
+  "description": "Country Prompt Template Id",
+  "valueType": "STRING"
+}
+```
+
+3. Push and publish the updated Remote Config template back to Firebase:
+
+```bash
+npm run config:push
+```
+
+* **`npm run config:push`** (`firebase/scripts/deploy-remote-config.mjs push`) fetches the latest `version` / `etag` metadata from Firebase to prevent `409` conflicts, updates `firebase/remote-config-template.json`, and runs `npx firebase deploy --only remoteconfig --project default`.
+* **Expected Output:**
+
+```text
+🔄 Preparing to push Remote Config template to Firebase Cloud...
+🔍 Fetching latest version metadata to avoid 409 conflicts...
+🚀 Deploying template via Firebase CLI...
+🎉 Remote Config deployment successfully completed!
+```
+
+> aside positive
+> **Slow Wi-Fi / CLI Fallback:** If `config:pull` or `config:push` fails on conference Wi-Fi, open **Firebase Console -> Remote Config**, edit `countryTemplateId` to `country-animal-guide-v0-0-1`, click **Save**, and click **Publish changes**.
+
+4. **Refresh** your Angular app at `http://localhost:5005` and submit `Japan` again. The app now generates a **national animal** guide and image—with **no Angular code changes and no redeployment needed**.
+
+*(Placeholder: add screenshot of the Angular app showing the Country Animal Guide result.)*
+
+**What this means:** Proves that changing Remote Config switches the live AI behavior and prompt template immediately on next fetch without rebuilding or redeploying your frontend.
+
+<!-- ------------------------ -->
+
+## Part 2: Add Real-Time Remote Config Listener & Revert Without Refresh
+
+Duration: 4
+
+Finally, add a real-time Remote Config listener in `ConfigService` so updates to `AppRemoteConfig` take effect in-memory **without refreshing the page**, then revert `countryTemplateId` back to `country-food-guide-v-0-0-1`.
+
+1. Open `src/app/services/config.service.ts` and add `onConfigUpdate` + `activate` (see [Add a real-time Remote Config listener](https://firebase.google.com/docs/ai-logic/server-prompt-templates/versioning-with-remote-config?api=dev#add-a-real-time-remote-config-listener)):
+
+```typescript
+import { activate, onConfigUpdate } from 'firebase/remote-config';
+
+// Inside ConfigService:
+listenForUpdates(): void {
+  if (!this.firebaseRemoteConfig) {
+    return;
+  }
+
+  onConfigUpdate(this.firebaseRemoteConfig, {
+    next: async (configUpdate) => {
+      if (configUpdate.getUpdatedKeys().has('countryTemplateId')) {
+        await activate(this.firebaseRemoteConfig!);
+        this.remoteConfig.update((current) => ({
+          ...current,
+          countryTemplateId: getString(this.firebaseRemoteConfig!, 'countryTemplateId'),
+        }));
+      }
+    },
+    error: (error) => console.error('Remote Config listener error:', error),
+  });
+}
+```
+
+> aside positive
+> **Note:** Real-time Remote Config updates require enabling the **Firebase Remote Config Realtime API** in your Google Cloud project and keeping an active streaming connection. If conference Wi-Fi drops the stream, refresh the page as a fallback.
+
+2. Revert `countryTemplateId` back to `country-food-guide-v-0-0-1`:
+   * Run `npm run config:pull`.
+   * Edit `firebase/remote-config-template.json` so `countryTemplateId` is `"country-food-guide-v-0-0-1"`.
+   * Run `npm run config:push` (or update and publish in **Firebase Console -> Remote Config**).
+
+3. **Without refreshing** `http://localhost:5005`, submit `Japan` again. `CountryService` reads the updated `countryTemplateId` from `ConfigService`'s `AppRemoteConfig` signal and reverts to generating the **Food Guide**.
+
+**What this means:** Demonstrates real-time Remote Config + Angular Signal reactivity—your running app picks up server-side template changes instantly in memory without even a browser refresh.
+
+> aside positive
+> **Congratulations!** You have built a secure Angular + Firebase AI Logic application using App Check (with local Debug Mode), Remote Config template versioning with real-time updates, and multimodal Server Prompt Templates grounded with Google Search.
+
+### Further Reading & Resources
+
+* **Angular Documentation**: <a href="https://angular.dev" target="_blank" rel="noopener">https://angular.dev</a>
+* **Get started with Firebase AI Logic Server Prompt Templates**: <a href="https://firebase.google.com/docs/ai-logic/server-prompt-templates/get-started?api=dev" target="_blank" rel="noopener">https://firebase.google.com/docs/ai-logic/server-prompt-templates/get-started?api=dev</a>
+* **Enforce App Check for Firebase AI Logic**: <a href="https://firebase.google.com/docs/ai-logic/app-check?api=dev" target="_blank" rel="noopener">https://firebase.google.com/docs/ai-logic/app-check?api=dev</a>
+* **Manage Server Prompt Template versions with Remote Config**: <a href="https://firebase.google.com/docs/ai-logic/server-prompt-templates/versioning-with-remote-config?api=dev#add-a-real-time-remote-config-listener" target="_blank" rel="noopener">https://firebase.google.com/docs/ai-logic/server-prompt-templates/versioning-with-remote-config?api=dev#add-a-real-time-remote-config-listener</a>

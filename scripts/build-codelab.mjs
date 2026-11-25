@@ -27,6 +27,27 @@ function escapeHtml(str) {
     .replaceAll('"', '&quot;');
 }
 
+function formatHeadingHtml(str) {
+  return escapeHtml(str).replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+function transformCallouts(html) {
+  return html
+    .replace(
+      /<blockquote>\s*<p>aside\s+(positive|negative)(?:<\/p>\s*|\s*\n?\s*)/gi,
+      (match, type) => {
+        const kind = type.toLowerCase();
+        return match.includes('</p>')
+          ? `<aside class="callout callout-${kind}">`
+          : `<aside class="callout callout-${kind}"><p>`;
+      }
+    )
+    .replace(
+      /<aside class="callout callout-(positive|negative)">([\s\S]*?)<\/blockquote>/g,
+      '<aside class="callout callout-$1">$2</aside>'
+    );
+}
+
 function parseCodelab(raw, fallbackId) {
   const sections = raw.split(STEP_DIVIDER);
   const intro = sections.shift() || '';
@@ -46,12 +67,15 @@ function parseCodelab(raw, fallbackId) {
     if (lines[0]?.startsWith('## ')) {
       label = lines.shift().replace(/^##\s+/, '').trim();
     }
+    while (lines.length > 0 && lines[0].trim() === '') {
+      lines.shift();
+    }
     if (lines[0] && /^Duration:\s*/i.test(lines[0])) {
       const parsed = Number(lines.shift().replace(/^Duration:\s*/i, '').trim());
       if (!Number.isNaN(parsed)) duration = parsed;
     }
 
-    const bodyHtml = marked(lines.join('\n').trim());
+    const bodyHtml = transformCallouts(marked(lines.join('\n').trim()));
     return { index, label, duration, bodyHtml };
   });
 
@@ -65,7 +89,7 @@ function renderHtml({ meta, steps, totalDuration }) {
       (s, i) => `
         <button class="step-nav-item${i === 0 ? ' active' : ''}" data-step="${i}" type="button">
           <span class="step-num">${i + 1}</span>
-          <span class="step-label">${escapeHtml(s.label)}</span>
+          <span class="step-label">${escapeHtml(s.label.replaceAll('`', ''))}</span>
         </button>`
     )
     .join('\n');
@@ -75,7 +99,7 @@ function renderHtml({ meta, steps, totalDuration }) {
       (s, i) => `
       <section class="step-panel${i === 0 ? ' active' : ''}" data-step="${i}">
         <div class="step-header">
-          <h2>${i + 1}. ${escapeHtml(s.label)}</h2>
+          <h2>${i + 1}. ${formatHeadingHtml(s.label)}</h2>
           ${s.duration ? `<span class="step-duration">${s.duration} min</span>` : ''}
         </div>
         <div class="step-body">
@@ -251,12 +275,34 @@ function renderHtml({ meta, steps, totalDuration }) {
       max-width: 100%;
       height: auto;
     }
-    .step-body code {
+    .step-body code,
+    .step-header h2 code {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       font-size: 0.9em;
       background: var(--code-bg);
       padding: 2px 6px;
       border-radius: 4px;
+    }
+    .callout {
+      margin: 16px 0;
+      padding: 14px 18px;
+      border-radius: 8px;
+      border-left: 4px solid var(--primary);
+      background: var(--primary-soft);
+    }
+    .callout > :first-child {
+      margin-top: 0;
+    }
+    .callout > :last-child {
+      margin-bottom: 0;
+    }
+    .callout-positive {
+      border-left-color: #1e8e3e;
+      background: #e6f4ea;
+    }
+    .callout-negative {
+      border-left-color: #ea8600;
+      background: #fef7e0;
     }
     .code-wrapper {
       position: relative;

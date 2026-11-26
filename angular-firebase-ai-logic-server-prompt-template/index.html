@@ -128,9 +128,9 @@
     }
     .step-header {
       display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 16px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
       padding-bottom: 14px;
       margin-bottom: 20px;
       border-bottom: 1px solid var(--border);
@@ -141,11 +141,12 @@
       font-weight: 600;
     }
     .step-duration {
-      flex-shrink: 0;
+      display: inline-block;
       font-size: 0.85rem;
-      color: var(--muted);
-      background: var(--bg);
-      padding: 3px 10px;
+      font-weight: 600;
+      color: var(--primary);
+      background: var(--primary-soft);
+      padding: 4px 12px;
       border-radius: 999px;
     }
     .step-body h3 {
@@ -272,7 +273,7 @@
   <header class="topbar">
     <h1 class="topbar-title">Build an Angular Web App with Firebase AI Logic Server Prompt Templates</h1>
     <div class="topbar-meta">
-      <span>Total: ~67 min</span>
+      <span>Total: ~69 min</span>
       <a href="https://github.com/railsstudent/devfest-2026-workshop" target="_blank" rel="noopener">GitHub Repo</a>
     </div>
   </header>
@@ -337,36 +338,41 @@
 
         <button class="step-nav-item" data-step="11" type="button">
           <span class="step-num">12</span>
-          <span class="step-label">Part 2: Fetch Server Template IDs into AppRemoteConfig in ConfigService</span>
+          <span class="step-label">Part 2: Create the Firebase AI Backend in ConfigService</span>
         </button>
 
         <button class="step-nav-item" data-step="12" type="button">
           <span class="step-num">13</span>
-          <span class="step-label">Part 2: Implement AiService for Server Prompt Templates</span>
+          <span class="step-label">Part 2: Fetch Server Template IDs into AppRemoteConfig in ConfigService</span>
         </button>
 
         <button class="step-nav-item" data-step="13" type="button">
           <span class="step-num">14</span>
-          <span class="step-label">Part 2: Wire CountryService and YoutubeSummarizerService</span>
+          <span class="step-label">Part 2: Implement AiService for Server Prompt Templates</span>
         </button>
 
         <button class="step-nav-item" data-step="14" type="button">
           <span class="step-num">15</span>
-          <span class="step-label">Part 2: Connect Component Generate Buttons to Services</span>
+          <span class="step-label">Part 2: Wire CountryService and YoutubeSummarizerService</span>
         </button>
 
         <button class="step-nav-item" data-step="15" type="button">
           <span class="step-num">16</span>
-          <span class="step-label">Part 2: Test the App on http://localhost:5005</span>
+          <span class="step-label">Part 2: Connect Component Generate Buttons to Services</span>
         </button>
 
         <button class="step-nav-item" data-step="16" type="button">
           <span class="step-num">17</span>
-          <span class="step-label">Part 2: Update countryTemplateId to Animal Guide and Refresh</span>
+          <span class="step-label">Part 2: Test the App on http://localhost:5005</span>
         </button>
 
         <button class="step-nav-item" data-step="17" type="button">
           <span class="step-num">18</span>
+          <span class="step-label">Part 2: Update countryTemplateId to Animal Guide and Refresh</span>
+        </button>
+
+        <button class="step-nav-item" data-step="18" type="button">
+          <span class="step-num">19</span>
           <span class="step-label">Part 2: Add Real-Time Remote Config Listener &amp; Revert Without Refresh</span>
         </button>
     </nav>
@@ -376,7 +382,7 @@
       <section class="step-panel active" data-step="0">
         <div class="step-header">
           <h2>1. Overview and Prerequisites</h2>
-          <span class="step-duration">1 min</span>
+          <span class="step-duration">Estimated duration: 1 min</span>
         </div>
         <div class="step-body">
           <p>Welcome to the <strong>Build an Angular Web App with Firebase AI Logic Server Prompt Templates</strong> workshop! This workshop is split into two parts:</p>
@@ -399,7 +405,7 @@
       <section class="step-panel" data-step="1">
         <div class="step-header">
           <h2>2. Part 1: Create a Firebase Project and Web App</h2>
-          <span class="step-duration">3 min</span>
+          <span class="step-duration">Estimated duration: 3 min</span>
         </div>
         <div class="step-body">
           <ol>
@@ -422,7 +428,7 @@
       <section class="step-panel" data-step="2">
         <div class="step-header">
           <h2>3. Part 1: Enable Firebase AI Logic</h2>
-          <span class="step-duration">2 min</span>
+          <span class="step-duration">Estimated duration: 2 min</span>
         </div>
         <div class="step-body">
           <h3>Enable Firebase AI Logic</h3>
@@ -447,7 +453,7 @@
       <section class="step-panel" data-step="3">
         <div class="step-header">
           <h2>4. Part 1: Enable App Check</h2>
-          <span class="step-duration">2 min</span>
+          <span class="step-duration">Estimated duration: 2 min</span>
         </div>
         <div class="step-body">
           <ol>
@@ -476,7 +482,7 @@
       <section class="step-panel" data-step="4">
         <div class="step-header">
           <h2>5. Part 1: Assign Billing Account to the Firebase Project</h2>
-          <span class="step-duration">2 min</span>
+          <span class="step-duration">Estimated duration: 2 min</span>
         </div>
         <div class="step-body">
           <p>To use Gemini models and features in Firebase AI Logic, link your redeemed Google Cloud Credits billing account to your Firebase project:</p>
@@ -496,7 +502,7 @@
       <section class="step-panel" data-step="5">
         <div class="step-header">
           <h2>6. Part 1: Create Server Prompt Templates</h2>
-          <span class="step-duration">15 min</span>
+          <span class="step-duration">Estimated duration: 15 min</span>
         </div>
         <div class="step-body">
           <p>In the Firebase Console sidebar, navigate to <strong>Firebase -&gt; AI Logic -&gt; Prompt templates</strong>:</p>
@@ -661,7 +667,7 @@ You are an expert at summarizing videos, finding the topic, and generating tags 
       <section class="step-panel" data-step="6">
         <div class="step-header">
           <h2>7. Part 1: Configure Firebase Remote Config</h2>
-          <span class="step-duration">2 min</span>
+          <span class="step-duration">Estimated duration: 2 min</span>
         </div>
         <div class="step-body">
           <p>In the Firebase Console sidebar, navigate to <strong>Firebase -&gt; DevOps &amp; Engagement -&gt; Feature Flagging -&gt; Remote Config</strong>. Instead of adding parameters manually one by one, you can upload a JSON template file that defines both Server Prompt Template ID parameters (<code>countryTemplateId</code> and <code>summarizeTemplateId</code>), their <code>STRING</code> data types, descriptions, and default values in a single step.</p>
@@ -707,7 +713,7 @@ You are an expert at summarizing videos, finding the topic, and generating tags 
       <section class="step-panel" data-step="7">
         <div class="step-header">
           <h2>8. Part 2: Clone Starter Repo, Link <code>.firebaserc</code>, and Run Setup Scripts</h2>
-          <span class="step-duration">4 min</span>
+          <span class="step-duration">Estimated duration: 4 min</span>
         </div>
         <div class="step-body">
           <p>In Part 2, the Angular UI is already built for you. Your focus is connecting the Angular services to Firebase—<strong>App Check (Debug Mode)</strong>, <strong>Remote Config</strong>, and <strong>Firebase AI Logic Server Prompt Templates</strong>—and wiring the component generate buttons.</p>
@@ -807,7 +813,7 @@ Successfully generated .../public/firebase.config.json
       <section class="step-panel" data-step="8">
         <div class="step-header">
           <h2>9. Part 2: Initialize Firebase in <code>ConfigService</code></h2>
-          <span class="step-duration">3 min</span>
+          <span class="step-duration">Estimated duration: 3 min</span>
         </div>
         <div class="step-body">
           <p>Because your Firebase project enforces <strong>App Check</strong>, initializing Firebase locally happens in three short steps across the next tabs:</p>
@@ -860,7 +866,7 @@ import { ConfigService } from &#39;./core/firebase/config.service&#39;;
       <section class="step-panel" data-step="9">
         <div class="step-header">
           <h2>10. Part 2: Configure App Check Debug Mode and Register Your Debug Token in <code>ConfigService</code></h2>
-          <span class="step-duration">5 min</span>
+          <span class="step-duration">Estimated duration: 5 min</span>
         </div>
         <div class="step-body">
           <ol>
@@ -896,11 +902,10 @@ import { ConfigService } from &#39;./core/firebase/config.service&#39;;
 <pre><code class="language-text">Firebase App Check debug token: &lt;app check debug token&gt;
 </code></pre>
 <p>Copy <code>&lt;app check debug token&gt;</code> and paste it to a temporary location first.</p>
-<img src="images/app-check-manage-debug-token.png" alt="Register app check debug token" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /><ol start="4">
+<ol start="4">
 <li>In the <strong>Firebase Console</strong>, go to <strong>Firebase -&gt; App Check -&gt; Apps -&gt; Your apps</strong>, click the <strong><code>⋮</code> (three dots)</strong> menu on the right side of your web app row <em>(this menu is easy to miss)</em>, and select <strong>Manage debug tokens</strong> -&gt; <strong>Add debug token</strong>.</li>
 </ol>
-<p><em>(Placeholder: add screenshot of App Check -&gt; Apps -&gt; <code>⋮</code> -&gt; Manage debug tokens.)</em></p>
-<ol start="5">
+<img src="images/app-check-manage-debug-token.png" alt="Register app check debug token" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /><ol start="5">
 <li>Input a recognizable name (for example, <code>Local Dev</code>), paste <code>&lt;app check debug token&gt;</code> into <strong>Value</strong>, and click <strong>Save</strong>.</li>
 </ol>
 <p><strong>What this means:</strong> Authorizes your local debug token in Firebase App Check so Firebase AI Logic accepts requests from your local machine while keeping App Check enforcement active.</p>
@@ -911,15 +916,14 @@ import { ConfigService } from &#39;./core/firebase/config.service&#39;;
       <section class="step-panel" data-step="10">
         <div class="step-header">
           <h2>11. Part 2: Update <code>firebase/.env</code> and Regenerate <code>public/firebase.config.json</code></h2>
-          <span class="step-duration">2 min</span>
+          <span class="step-duration">Estimated duration: 2 min</span>
         </div>
         <div class="step-body">
           <ol>
 <li>Paste that exact registered UUID into <code>APP_FIREBASE_APPCHECK_DEBUG_TOKEN</code> in <code>firebase/.env</code>:</li>
 </ol>
-<pre><code class="language-env">APP_FIREBASE_PROJECT_ID=&quot;&lt;Firebase Project ID&gt;&quot;
-APP_FIREBASE_WEB_APP_NAME=&quot;&lt;Firebase Web App Display Name&gt;&quot;
-APP_FIREBASE_APPCHECK_DEBUG_TOKEN=&quot;12345678-90ab-cdef-1234-567890abcdef&quot;
+<pre><code class="language-env">APP_FIREBASE_WEB_APP_NAME=&quot;&lt;App nickname&gt;&quot;
+APP_FIREBASE_APPCHECK_DEBUG_TOKEN=&quot;&lt;app check debug token&gt;&quot;
 </code></pre>
 <ol start="2">
 <li>Regenerate <code>public/firebase.config.json</code> so <code>&quot;appCheckDebugToken&quot;</code> contains your registered UUID, then restart the emulator:</li>
@@ -940,8 +944,42 @@ npm run firebase:emulators:start
 
       <section class="step-panel" data-step="11">
         <div class="step-header">
-          <h2>12. Part 2: Fetch Server Template IDs into <code>AppRemoteConfig</code> in <code>ConfigService</code></h2>
-          <span class="step-duration">4 min</span>
+          <h2>12. Part 2: Create the Firebase AI Backend in <code>ConfigService</code></h2>
+          <span class="step-duration">Estimated duration: 2 min</span>
+        </div>
+        <div class="step-body">
+          <p>Now that <code>FirebaseApp</code> and <code>AppCheck</code> are initialized, create the Firebase AI Logic backend instance in <code>ConfigService</code> so the rest of your app can access it via <code>aiBackend</code>.</p>
+<ol>
+<li>Open <code>src/app/core/firebase/config.service.ts</code>:<ul>
+<li>At the top of the file, import <code>getAI</code> and <code>GoogleAIBackend</code> from <code>&#39;firebase/ai&#39;</code>:</li>
+</ul>
+</li>
+</ol>
+<pre><code class="language-typescript">import { getAI, GoogleAIBackend } from &#39;firebase/ai&#39;;
+</code></pre>
+<ul>
+<li>Inside <code>initialize()</code> (right below <code>initializeAppCheck(...)</code>), initialize <code>this.#ai</code>:</li>
+</ul>
+<pre><code class="language-typescript">    this.#ai = getAI(this.#firebaseApp, {
+      backend: new GoogleAIBackend(),
+      useLimitedUseAppCheckTokens: true,
+    });
+</code></pre>
+<aside class="callout callout-positive"><p><strong>Why <code>GoogleAIBackend</code> and <code>useLimitedUseAppCheckTokens</code>?</strong></p>
+<ul>
+<li><strong><code>new GoogleAIBackend()</code></strong>: Connects Firebase AI Logic to the Gemini Developer API backend.</li>
+<li><strong><code>useLimitedUseAppCheckTokens: true</code></strong>: Requests single-use App Check tokens for AI Logic calls, adding replay protection for sensitive generative AI endpoints.</li>
+</ul>
+</aside>
+<p><strong>What this means:</strong> Initializes your <code>AI</code> backend singleton on <code>ConfigService</code> with App Check protection enabled, ready for services to call <code>configService.aiBackend</code>.</p>
+
+        </div>
+      </section>
+
+      <section class="step-panel" data-step="12">
+        <div class="step-header">
+          <h2>13. Part 2: Fetch Server Template IDs into <code>AppRemoteConfig</code> in <code>ConfigService</code></h2>
+          <span class="step-duration">Estimated duration: 4 min</span>
         </div>
         <div class="step-body">
           <p>Next, update <code>ConfigService</code> to fetch your Remote Config parameters and store them in the <code>remoteConfig</code> signal (<code>AppRemoteConfig</code>).</p>
@@ -988,10 +1026,10 @@ import {
         </div>
       </section>
 
-      <section class="step-panel" data-step="12">
+      <section class="step-panel" data-step="13">
         <div class="step-header">
-          <h2>13. Part 2: Implement <code>AiService</code> for Server Prompt Templates</h2>
-          <span class="step-duration">4 min</span>
+          <h2>14. Part 2: Implement <code>AiService</code> for Server Prompt Templates</h2>
+          <span class="step-duration">Estimated duration: 4 min</span>
         </div>
         <div class="step-body">
           <p>Now implement <code>AiService</code>, which uses <code>FirebaseApp</code> from <code>ConfigService</code> to initialize <strong>Firebase AI Logic</strong> (<code>getTemplateGenerativeModel</code>) and exposes a reusable method accepting <code>templateId</code> and <code>params</code>.</p>
@@ -1041,10 +1079,10 @@ export class AiService {
         </div>
       </section>
 
-      <section class="step-panel" data-step="13">
+      <section class="step-panel" data-step="14">
         <div class="step-header">
-          <h2>14. Part 2: Wire <code>CountryService</code> and <code>YoutubeSummarizerService</code></h2>
-          <span class="step-duration">4 min</span>
+          <h2>15. Part 2: Wire <code>CountryService</code> and <code>YoutubeSummarizerService</code></h2>
+          <span class="step-duration">Estimated duration: 4 min</span>
         </div>
         <div class="step-body">
           <p>Both feature services read their active template ID from <code>ConfigService</code>&#39;s <code>AppRemoteConfig</code> signal and pass <code>(templateId, params)</code> to <code>AiService</code>.</p>
@@ -1134,10 +1172,10 @@ export class YoutubeSummarizerService {
         </div>
       </section>
 
-      <section class="step-panel" data-step="14">
+      <section class="step-panel" data-step="15">
         <div class="step-header">
-          <h2>15. Part 2: Connect Component Generate Buttons to Services</h2>
-          <span class="step-duration">3 min</span>
+          <h2>16. Part 2: Connect Component Generate Buttons to Services</h2>
+          <span class="step-duration">Estimated duration: 3 min</span>
         </div>
         <div class="step-body">
           <p>Now connect the pre-built Angular UI buttons to <code>CountryService</code> and <code>YoutubeSummarizerService</code>.</p>
@@ -1172,10 +1210,10 @@ export class YoutubeSummarizerService {
         </div>
       </section>
 
-      <section class="step-panel" data-step="15">
+      <section class="step-panel" data-step="16">
         <div class="step-header">
-          <h2>16. Part 2: Test the App on <code>http://localhost:5005</code></h2>
-          <span class="step-duration">3 min</span>
+          <h2>17. Part 2: Test the App on <code>http://localhost:5005</code></h2>
+          <span class="step-duration">Estimated duration: 3 min</span>
         </div>
         <div class="step-body">
           <p>Verify that the entire local stack works end-to-end before testing Remote Config template switching.</p>
@@ -1192,10 +1230,10 @@ export class YoutubeSummarizerService {
         </div>
       </section>
 
-      <section class="step-panel" data-step="16">
+      <section class="step-panel" data-step="17">
         <div class="step-header">
-          <h2>17. Part 2: Update <code>countryTemplateId</code> to Animal Guide and Refresh</h2>
-          <span class="step-duration">4 min</span>
+          <h2>18. Part 2: Update <code>countryTemplateId</code> to Animal Guide and Refresh</h2>
+          <span class="step-duration">Estimated duration: 4 min</span>
         </div>
         <div class="step-body">
           <p>Now update <code>countryTemplateId</code> in Remote Config from <code>country-food-guide-v-0-0-1</code> to <code>country-animal-guide-v0-0-1</code> using the CLI scripts, then refresh the browser to see the AI output change with <strong>zero Angular code changes and zero redeployment</strong>.</p>
@@ -1247,10 +1285,10 @@ export class YoutubeSummarizerService {
         </div>
       </section>
 
-      <section class="step-panel" data-step="17">
+      <section class="step-panel" data-step="18">
         <div class="step-header">
-          <h2>18. Part 2: Add Real-Time Remote Config Listener &amp; Revert Without Refresh</h2>
-          <span class="step-duration">4 min</span>
+          <h2>19. Part 2: Add Real-Time Remote Config Listener &amp; Revert Without Refresh</h2>
+          <span class="step-duration">Estimated duration: 4 min</span>
         </div>
         <div class="step-body">
           <p>Finally, add a real-time Remote Config listener in <code>ConfigService</code> so updates to <code>AppRemoteConfig</code> take effect in-memory <strong>without refreshing the page</strong>, then revert <code>countryTemplateId</code> back to <code>country-food-guide-v-0-0-1</code>.</p>

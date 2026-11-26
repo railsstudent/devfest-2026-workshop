@@ -778,25 +778,61 @@ export default class SummarizerComponent {
 
 **What `submission.action` does:** When the Signal Form is submitted, `action` reads `summarizeTemplateId` from `#configService.appConfig()`, calls `#aiService.generateResponse(...)` with `this.summarizerModel()`, parses the JSON `VideoSummary` into `this.videoSummary`, and returns `{ kind: 'serverError', message: 'Failed to submit form' }` if the request fails.
 
-Now connect the pre-built Angular UI buttons to `CountryService`.
+Now connect `CountryComponent` to `ConfigService` and `AiService`.
 
-4. In the Country Guide component template and TypeScript class, wire the **Generate** button `(click)` event to a component method that calls `CountryService`:
-
-```html
-<button type="button" (click)="onGenerateCountryGuide()" [disabled]="loading()">
-  Generate
-</button>
-```
+4. Open `src/app/features/country/country.component.ts` and add the `AiService`, `ConfigService`, `computed`, and `inject` imports at the top of the file:
 
 ```typescript
-async onGenerateCountryGuide(): Promise<void> {
-  const templateId = this.configService.remoteConfig().countryTemplateId;
-  const country = this.countrySignal();
-  this.result.set(await this.countryService.generateCountryGuide(country, templateId));
-}
+import { AiService } from '@/core/firebase/ai.service';
+import { ConfigService } from '@/core/firebase/config.service';
+import { Component, computed, inject, signal } from '@angular/core';
 ```
 
-**What `(click)="..."` does / What this means:** Clicking the button calls the component handler method, which calls `CountryService` or `YoutubeSummarizerService`—passing the active template ID (from `ConfigService`'s `AppRemoteConfig` signal) and the signal form values (`country` or `url`)—to generate and render the AI response in the UI.
+5. Inside the `CountryComponent` class body, inject `AiService` and `ConfigService` right below `readonly countries = countryData.countries;`, and add the `countryTemplateId` computed signal below `imageUrl`:
+
+```typescript
+export default class CountryComponent {
+  readonly countries = countryData.countries;
+  #aiService = inject(AiService);
+  #configService = inject(ConfigService);
+
+  // ...omitted...
+  imageUrl = signal('');
+  countryTemplateId = computed(() => this.#configService.appConfig().countryTemplateId);
+```
+
+6. Inside `countryForm`, replace the `submission` option so form submission reads `this.countryTemplateId()` and calls `AiService.generateInlineData`:
+
+```typescript
+  countryForm = form(
+    this.countryModel,
+    (schemaPath) => {
+      // ...omitted...
+    },
+    {
+      submission: {
+        action: async () => {
+          try {
+            this.imageUrl.set('');
+            const result = await this.#aiService.generateInlineData({
+              templateId: this.countryTemplateId(),
+              templateVariables: this.countryModel(),
+            });
+
+            this.imageUrl.set(result);
+            return undefined;
+          } catch (e) {
+            console.log(e);
+            this.imageUrl.set('');
+            return { kind: 'serverError', message: 'Failed to submit form' };
+          }
+        },
+      },
+    },
+  );
+```
+
+**What this means:** `countryTemplateId` reacts automatically to changes in `ConfigService.appConfig()`. When the Signal Form is submitted, `submission.action` calls `#aiService.generateInlineData(...)` with `this.countryTemplateId()` and `this.countryModel()`, then updates `this.imageUrl` to render the generated image in the UI.
 
 <!-- ------------------------ -->
 
@@ -809,9 +845,7 @@ Verify that the entire local stack works end-to-end before testing Remote Config
 1. Open `http://localhost:5005` in your browser.
 2. **Test Country Guide**: Enter a country (for example, `Japan`) and click **Generate**. Verify that the app displays the dish description, the generated food image (`country-food-guide-v0-0-1`), and the Google Search grounding sources.
 
-*(Placeholder: add screenshot of the Angular app showing the Country Food Guide result.)*
-
-3. **Test YouTube Summarizer**: Paste a public YouTube URL and click **Generate Summary**. Verify that `summarize-youtube-url-v-0-0-1` returns a concise summary.
+3. **Test YouTube Summarizer**: Paste a public YouTube URL and click **Generate Summary**. Verify that `summarize-youtube-url-v0-0-1` returns a concise summary.
 
 **What this means:** Confirms the full pipeline—App Check debug token -> Remote Config template IDs -> AI Logic Server Prompt Templates -> grounded multimodal UI output—works together locally.
 
@@ -869,8 +903,6 @@ npm run config:push
 > **Slow Wi-Fi / CLI Fallback:** If `config:pull` or `config:push` fails on conference Wi-Fi, open **Firebase Console -> Remote Config**, edit `countryTemplateId` to `country-animal-guide-v0-0-1`, click **Save**, and click **Publish changes**.
 
 4. **Refresh** your Angular app at `http://localhost:5005` and submit `Japan` again. The app now generates a **national animal** guide and image—with **no Angular code changes and no redeployment needed**.
-
-*(Placeholder: add screenshot of the Angular app showing the Country Animal Guide result.)*
 
 **What this means:** Proves that changing Remote Config switches the live AI behavior and prompt template immediately on next fetch without rebuilding or redeploying your frontend.
 

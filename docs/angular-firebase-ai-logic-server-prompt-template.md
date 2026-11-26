@@ -442,8 +442,8 @@ Successfully wrote .../public/remote-config-defaults.json
 
 ```json
 {
-  "countryTemplateId": "country-food-guide-v-0-0-1",
-  "summarizeTemplateId": "summarize-youtube-url-v-0-0-1"
+  "countryTemplateId": "country-food-guide-v0-0-1",
+  "summarizeTemplateId": "summarize-youtube-url-v0-0-1"
 }
 ```
 

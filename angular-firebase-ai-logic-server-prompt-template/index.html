@@ -273,7 +273,7 @@
   <header class="topbar">
     <h1 class="topbar-title">Build an Angular Web App with Firebase AI Logic Server Prompt Templates</h1>
     <div class="topbar-meta">
-      <span>Total: ~69 min</span>
+      <span>Total: ~64 min</span>
       <a href="https://github.com/railsstudent/devfest-2026-workshop" target="_blank" rel="noopener">GitHub Repo</a>
     </div>
   </header>
@@ -502,7 +502,7 @@
       <section class="step-panel" data-step="5">
         <div class="step-header">
           <h2>6. Part 1: Create Server Prompt Templates</h2>
-          <span class="step-duration">Estimated duration: 15 min</span>
+          <span class="step-duration">Estimated duration: 10 min</span>
         </div>
         <div class="step-body">
           <p>In the Firebase Console sidebar, navigate to <strong>Firebase -&gt; AI Logic -&gt; Prompt templates</strong>:</p>
@@ -982,46 +982,63 @@ npm run firebase:emulators:start
           <span class="step-duration">Estimated duration: 4 min</span>
         </div>
         <div class="step-body">
-          <p>Next, update <code>ConfigService</code> to fetch your Remote Config parameters and store them in the <code>remoteConfig</code> signal (<code>AppRemoteConfig</code>).</p>
+          <p>Next, update <code>ConfigService</code> to fetch your Remote Config parameters and store them in the <code>#appConfig</code> signal (<code>AppRemoteConfig</code>), which is exposed as the read-only <code>appConfig</code> signal.</p>
 <ol>
-<li>Open <code>src/app/services/config.service.ts</code> and complete the second <code>// TODO</code> block to import <code>@/public/remote-config-defaults.json</code>, initialize <code>remoteConfig</code> with those defaults, call <code>fetchAndActivate</code>, and update <code>this.remoteConfig</code>:</li>
+<li>Open <code>src/app/core/firebase/config.service.ts</code> and add the Remote Config imports (<code>remoteConfigDefault</code>, <code>isDevMode</code>, and <code>firebase/remote-config</code>):</li>
 </ol>
-<pre><code class="language-typescript">// TODO (Step 3): Import the generated Remote Config defaults JSON
-import remoteConfigDefaults from &#39;@/public/remote-config-defaults.json&#39;;
-import {
-  fetchAndActivate,
-  getRemoteConfig,
-  getString,
-  RemoteConfig,
-} from &#39;firebase/remote-config&#39;;
+<pre><code class="language-typescript">import remoteConfigDefault from &#39;@/public/remote-config-defaults.json&#39;;
+import { isDevMode, Service, signal } from &#39;@angular/core&#39;;
+import { fetchAndActivate, getRemoteConfig, getString } from &#39;firebase/remote-config&#39;;
+</code></pre>
+<ol start="2">
+<li>Add the cache-duration constants above <code>@Service()</code>:</li>
+</ol>
+<pre><code class="language-typescript">const SECONDS = 60;
+const MILLISECONDS = 1000;
+const ONE_HOUR_IN_MILLISECONDS = SECONDS * SECONDS * MILLISECONDS;
+</code></pre>
+<ol start="3">
+<li>At the end of <code>initialize()</code>, call <code>await this.loadRemoteConfig();</code>:</li>
+</ol>
+<pre><code class="language-typescript">  async initialize(): Promise&lt;void&gt; {
+    // ...omitted...
 
-// Inside ConfigService:
-  readonly remoteConfig = signal&lt;AppRemoteConfig&gt;({
-    countryTemplateId: remoteConfigDefaults.countryTemplateId,
-    summarizeTemplateId: remoteConfigDefaults.summarizeTemplateId,
-  });
-
-  private firebaseRemoteConfig?: RemoteConfig;
-
-  async loadRemoteConfig(): Promise&lt;void&gt; {
-    this.initFirebase();
-    this.firebaseRemoteConfig = getRemoteConfig(this.app);
-
-    // Fetch immediately on localhost; use a higher interval in production.
-    this.firebaseRemoteConfig.settings.minimumFetchIntervalMillis =
-      location.hostname === &#39;localhost&#39; ? 0 : 43_200_000;
-
-    this.firebaseRemoteConfig.defaultConfig = remoteConfigDefaults;
-
-    await fetchAndActivate(this.firebaseRemoteConfig);
-
-    this.remoteConfig.set({
-      countryTemplateId: getString(this.firebaseRemoteConfig, &#39;countryTemplateId&#39;),
-      summarizeTemplateId: getString(this.firebaseRemoteConfig, &#39;summarizeTemplateId&#39;),
-    });
+    await this.loadRemoteConfig();
   }
 </code></pre>
-<p><strong>What this means:</strong> Decouples prompt template versions from your Angular bundle—your app asks Firebase Remote Config which template ID to run instead of hardcoding template names in client code.</p>
+<ol start="4">
+<li>Add the <code>private async loadRemoteConfig()</code> method to <code>ConfigService</code>:</li>
+</ol>
+<pre><code class="language-typescript">  private async loadRemoteConfig(): Promise&lt;void&gt; {
+    try {
+      const rc = getRemoteConfig(this.app);
+      rc.defaultConfig = remoteConfigDefault;
+      rc.settings.minimumFetchIntervalMillis = isDevMode() ? 0 : ONE_HOUR_IN_MILLISECONDS;
+      await fetchAndActivate(rc);
+      this.#appConfig.set({
+        summarizeTemplateId: getString(rc, &#39;summarizeTemplateId&#39;),
+        countryTemplateId: getString(rc, &#39;countryTemplateId&#39;),
+      });
+      console.log(this.#appConfig());
+    } catch (e) {
+      console.warn(&#39;Remote Config fetch timed out or failed. Using defaults:&#39;, e);
+    }
+  }
+</code></pre>
+<ol start="5">
+<li>Open <code>src/app/app.config.ts</code> and update <code>provideAppInitializer</code> to <code>await configService.initialize()</code> so Angular waits for Firebase initialization and Remote Config loading to finish before rendering:</li>
+</ol>
+<pre><code class="language-typescript">    provideAppInitializer(async () =&gt; {
+      const configService = inject(ConfigService);
+      await configService.initialize();
+    }),
+</code></pre>
+<p><strong>What this means:</strong></p>
+<ul>
+<li><strong>Updating the Angular Signal (<code>this.#appConfig.set(...)</code>):</strong> <code>#appConfig</code> is an Angular Signal initialized with empty default values (<code>countryTemplateId: &#39;&#39;</code>, <code>summarizeTemplateId: &#39;&#39;</code>). Calling <code>this.#appConfig.set(...)</code> overwrites those default values in the signal with the dynamic template IDs fetched from Remote Config, and any code reading <code>configService.appConfig()</code> automatically receives the updated values.</li>
+<li><strong>Dev vs. production fetch interval (<code>minimumFetchIntervalMillis</code>):</strong> This setting controls how long the browser caches fetched Remote Config values locally before <code>fetchAndActivate(rc)</code> makes another network request. In development (<code>isDevMode()</code> is <code>true</code>), <code>0</code> disables the local cache so template ID changes published in the Firebase Console appear on your next page reload. In production (<code>isDevMode()</code> is <code>false</code>), <code>ONE_HOUR_IN_MILLISECONDS</code> caches values in the browser for 1 hour to reduce network requests and avoid rate limits.</li>
+<li><strong>Decoupled template versions:</strong> Your Angular app asks Firebase Remote Config which server prompt template ID to run instead of hardcoding template names in client code.</li>
+</ul>
 
         </div>
       </section>

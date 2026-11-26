@@ -192,10 +192,10 @@ Click the **Save template** button to save all the changes.
 
 ---
 
-### b) Country Food Guide (`country-food-guide-v-0-0-1`)
+### b) Country Food Guide (`country-food-guide-v0-0-1`)
 
 * **Template Name**: Country Food Guide
-* **Template ID**: country-food-guide-v-0-0-1
+* **Template ID**: country-food-guide-v0-0-1
 
 * **Configuration**:
 
@@ -241,10 +241,10 @@ Click the **Save template** button to save all the changes.
 
 ---
 
-### c) Summarize YouTube URL (`summarize-youtube-url-v-0-0-1`)
+### c) Summarize YouTube URL (`summarize-youtube-url-v0-0-1`)
 
 * **Template Name**: Summarize YouTube URL
-* **Template ID**: summarize-youtube-url-v-0-0-1
+* **Template ID**: summarize-youtube-url-v0-0-1
 
 * **Configuration**:
 
@@ -312,14 +312,14 @@ In the Firebase Console sidebar, navigate to **Firebase -> DevOps & Engagement -
   "parameters": {
     "countryTemplateId": {
       "defaultValue": {
-        "value": "country-food-guide-v-0-0-1"
+        "value": "country-food-guide-v0-0-1"
       },
       "description": "Country Prompt Template Id",
       "valueType": "STRING"
     },
     "summarizeTemplateId": {
       "defaultValue": {
-        "value": "summarize-youtube-url-v-0-0-1"
+        "value": "summarize-youtube-url-v0-0-1"
       },
       "description": "Summarize Template Id",
       "valueType": "STRING"
@@ -863,7 +863,7 @@ Duration: 3
 Verify that the entire local stack works end-to-end before testing Remote Config template switching.
 
 1. Open `http://localhost:5005` in your browser.
-2. **Test Country Guide**: Enter a country (for example, `Japan`) and click **Generate**. Verify that the app displays the dish description, the generated food image (`country-food-guide-v-0-0-1`), and the Google Search grounding sources.
+2. **Test Country Guide**: Enter a country (for example, `Japan`) and click **Generate**. Verify that the app displays the dish description, the generated food image (`country-food-guide-v0-0-1`), and the Google Search grounding sources.
 
 *(Placeholder: add screenshot of the Angular app showing the Country Food Guide result.)*
 
@@ -877,7 +877,7 @@ Verify that the entire local stack works end-to-end before testing Remote Config
 
 Duration: 4
 
-Now update `countryTemplateId` in Remote Config from `country-food-guide-v-0-0-1` to `country-animal-guide-v0-0-1` using the CLI scripts, then refresh the browser to see the AI output change with **zero Angular code changes and zero redeployment**.
+Now update `countryTemplateId` in Remote Config from `country-food-guide-v0-0-1` to `country-animal-guide-v0-0-1` using the CLI scripts, then refresh the browser to see the AI output change with **zero Angular code changes and zero redeployment**.
 
 1. Pull the live Remote Config template from Firebase into `firebase/remote-config-template.json`:
 
@@ -893,7 +893,7 @@ npm run config:pull
 ✅ Successfully saved live template to: .../firebase/remote-config-template.json
 ```
 
-2. Open `firebase/remote-config-template.json` and update `countryTemplateId`'s `defaultValue.value` from `country-food-guide-v-0-0-1` to `country-animal-guide-v0-0-1`:
+2. Open `firebase/remote-config-template.json` and update `countryTemplateId`'s `defaultValue.value` from `country-food-guide-v0-0-1` to `country-animal-guide-v0-0-1`:
 
 ```json
 "countryTemplateId": {
@@ -936,7 +936,7 @@ npm run config:push
 
 Duration: 4
 
-Finally, add a real-time Remote Config listener in `ConfigService` so updates to `AppRemoteConfig` take effect in-memory **without refreshing the page**, then revert `countryTemplateId` back to `country-food-guide-v-0-0-1`.
+Finally, add a real-time Remote Config listener in `ConfigService` so updates to `AppRemoteConfig` take effect in-memory **without refreshing the page**, then revert `countryTemplateId` back to `country-food-guide-v0-0-1`.
 
 1. Open `src/app/services/config.service.ts` and add `onConfigUpdate` + `activate` (see [Add a real-time Remote Config listener](https://firebase.google.com/docs/ai-logic/server-prompt-templates/versioning-with-remote-config?api=dev#add-a-real-time-remote-config-listener)):
 
@@ -967,9 +967,9 @@ listenForUpdates(): void {
 > aside positive
 > **Note:** Real-time Remote Config updates require enabling the **Firebase Remote Config Realtime API** in your Google Cloud project and keeping an active streaming connection. If conference Wi-Fi drops the stream, refresh the page as a fallback.
 
-2. Revert `countryTemplateId` back to `country-food-guide-v-0-0-1`:
+2. Revert `countryTemplateId` back to `country-food-guide-v0-0-1`:
    * Run `npm run config:pull`.
-   * Edit `firebase/remote-config-template.json` so `countryTemplateId` is `"country-food-guide-v-0-0-1"`.
+   * Edit `firebase/remote-config-template.json` so `countryTemplateId` is `"country-food-guide-v0-0-1"`.
    * Run `npm run config:push` (or update and publish in **Firebase Console -> Remote Config**).
 
 3. **Without refreshing** `http://localhost:5005`, submit `Japan` again. `CountryService` reads the updated `countryTemplateId` from `ConfigService`'s `AppRemoteConfig` signal and reverts to generating the **Food Guide**.

@@ -272,7 +272,7 @@
   <header class="topbar">
     <h1 class="topbar-title">Build an Angular Web App with Firebase AI Logic Server Prompt Templates</h1>
     <div class="topbar-meta">
-      <span>Total: ~62 min</span>
+      <span>Total: ~67 min</span>
       <a href="https://github.com/railsstudent/devfest-2026-workshop" target="_blank" rel="noopener">GitHub Repo</a>
     </div>
   </header>
@@ -322,41 +322,51 @@
 
         <button class="step-nav-item" data-step="8" type="button">
           <span class="step-num">9</span>
-          <span class="step-label">Part 2: Initialize Firebase and App Check Debug Mode in ConfigService</span>
+          <span class="step-label">Part 2: Initialize Firebase in ConfigService</span>
         </button>
 
         <button class="step-nav-item" data-step="9" type="button">
           <span class="step-num">10</span>
-          <span class="step-label">Part 2: Fetch Server Template IDs into AppRemoteConfig in ConfigService</span>
+          <span class="step-label">Part 2: Configure App Check Debug Mode and Register Your Debug Token in ConfigService</span>
         </button>
 
         <button class="step-nav-item" data-step="10" type="button">
           <span class="step-num">11</span>
-          <span class="step-label">Part 2: Implement AiService for Server Prompt Templates</span>
+          <span class="step-label">Part 2: Update firebase/.env and Regenerate public/firebase.config.json</span>
         </button>
 
         <button class="step-nav-item" data-step="11" type="button">
           <span class="step-num">12</span>
-          <span class="step-label">Part 2: Wire CountryService and YoutubeSummarizerService</span>
+          <span class="step-label">Part 2: Fetch Server Template IDs into AppRemoteConfig in ConfigService</span>
         </button>
 
         <button class="step-nav-item" data-step="12" type="button">
           <span class="step-num">13</span>
-          <span class="step-label">Part 2: Connect Component Generate Buttons to Services</span>
+          <span class="step-label">Part 2: Implement AiService for Server Prompt Templates</span>
         </button>
 
         <button class="step-nav-item" data-step="13" type="button">
           <span class="step-num">14</span>
-          <span class="step-label">Part 2: Test the App on http://localhost:5005</span>
+          <span class="step-label">Part 2: Wire CountryService and YoutubeSummarizerService</span>
         </button>
 
         <button class="step-nav-item" data-step="14" type="button">
           <span class="step-num">15</span>
-          <span class="step-label">Part 2: Update countryTemplateId to Animal Guide and Refresh</span>
+          <span class="step-label">Part 2: Connect Component Generate Buttons to Services</span>
         </button>
 
         <button class="step-nav-item" data-step="15" type="button">
           <span class="step-num">16</span>
+          <span class="step-label">Part 2: Test the App on http://localhost:5005</span>
+        </button>
+
+        <button class="step-nav-item" data-step="16" type="button">
+          <span class="step-num">17</span>
+          <span class="step-label">Part 2: Update countryTemplateId to Animal Guide and Refresh</span>
+        </button>
+
+        <button class="step-nav-item" data-step="17" type="button">
+          <span class="step-num">18</span>
           <span class="step-label">Part 2: Add Real-Time Remote Config Listener &amp; Revert Without Refresh</span>
         </button>
     </nav>
@@ -704,7 +714,7 @@ You are an expert at summarizing videos, finding the topic, and generating tags 
 <ol>
 <li>Clone the Angular starter repository and install dependencies:</li>
 </ol>
-<pre><code class="language-bash">git clone https://github.com/&lt;your-org&gt;/devfest-2026-angular-ai-logic-starter.git
+<pre><code class="language-bash">git clone https://github.com/railsstudent/devfest-2026-angular-ai-logic-starter.git
 cd devfest-2026-angular-ai-logic-starter
 npm install
 </code></pre>
@@ -712,11 +722,11 @@ npm install
 <p><strong>Starter vs. Solution:</strong> The <code>main</code> branch contains the starter app with <code>// TODO</code> markers. If you get stuck, you can inspect the <code>solution</code> branch for the complete implementation.</p>
 </aside>
 <ol start="2">
-<li>Log in to the Firebase CLI and set your Firebase <strong>Project ID</strong> (not the display name) as the <code>default</code> project in <code>.firebaserc</code>:</li>
+<li>Log in to the Firebase CLI and set your Firebase <strong>Project ID</strong> as the <code>default</code> project in <code>.firebaserc</code>:</li>
 </ol>
 <pre><code class="language-bash">npx firebase login
 </code></pre>
-<p>Open <code>.firebaserc</code> and replace <code>&lt;your-firebase-project-id&gt;</code> with your Project ID from Part 1:</p>
+<p>To find it in the Firebase Console, go to ⚙️ <strong>Firebase</strong> -&gt; <strong>Settings</strong> -&gt; <strong>General</strong> -&gt; <strong>Project ID</strong>. Open <code>.firebaserc</code> and replace <code>&lt;your-firebase-project-id&gt;</code> with your Project ID:</p>
 <pre><code class="language-json">{
   &quot;projects&quot;: {
     &quot;default&quot;: &quot;&lt;your-firebase-project-id&gt;&quot;
@@ -724,11 +734,12 @@ npm install
 }
 </code></pre>
 <ol start="3">
-<li>Copy <code>firebase/.env.example</code> to <code>firebase/.env</code> and fill in your Web App display name from Part 1:</li>
+<li>Copy <code>firebase/.env.example</code> to <code>firebase/.env</code>:</li>
 </ol>
 <pre><code class="language-bash">cp firebase/.env.example firebase/.env
 </code></pre>
-<pre><code class="language-env">APP_FIREBASE_WEB_APP_NAME=&quot;&lt;Firebase Web App Display Name&gt;&quot;
+<p>In the Firebase Console, go to ⚙️ <strong>Firebase</strong> -&gt; <strong>Settings</strong> -&gt; <strong>General</strong> -&gt; <strong>Your apps</strong>, copy the <strong>App nickname</strong>, and assign it to <code>APP_FIREBASE_WEB_APP_NAME</code> in <code>firebase/.env</code>:</p>
+<pre><code class="language-env">APP_FIREBASE_WEB_APP_NAME=&quot;&lt;App nickname&gt;&quot;
 APP_FIREBASE_APPCHECK_DEBUG_TOKEN=&quot;&quot;
 </code></pre>
 <p>Leave <code>APP_FIREBASE_APPCHECK_DEBUG_TOKEN=&quot;&quot;</code> empty for your first run.</p>
@@ -784,120 +795,152 @@ Successfully generated .../public/firebase.config.json
 <p><em>Tip: Calling these Firebase CLI scripts is free, though subject to standard API rate limits—run them manually when needed rather than inside a loop or file watcher.</em></p>
 <aside class="callout callout-positive"><p><strong>Slow Wi-Fi / CLI Fallback:</strong> If the Firebase CLI scripts time out on venue Wi-Fi, you can create both files manually from the Firebase Console:</p>
 <ul>
-<li><strong><code>public/firebase.config.json</code></strong>: Open <strong>Project Settings -&gt; General -&gt; Your apps</strong>, select <strong>Config</strong> under <strong>SDK setup and configuration</strong>, copy your <code>firebaseConfig</code> object into <code>&quot;app&quot;</code>, and add <code>&quot;appCheckDebugToken&quot;: &quot;&quot;</code>.</li>
-<li><strong><code>public/remote-config-defaults.json</code></strong>: Open <strong>Remote Config</strong>, click the top-right <code>⋮</code> menu -&gt; <strong>Download default values</strong>, select <strong><code>.json</code></strong>, click <strong>Download file</strong>, and save/rename the downloaded <code>remote_config_defaults.json</code> file to <code>public/remote-config-defaults.json</code> (note the hyphens).</li>
+<li><strong><code>public/firebase.config.json</code></strong>: Go to ⚙️ <strong>Firebase</strong> -&gt; <strong>Settings</strong> -&gt; <strong>General</strong> -&gt; <strong>Your apps</strong>, select <strong>Config</strong> under <strong>SDK setup and configuration</strong>, copy your <code>firebaseConfig</code> values into <code>&quot;app&quot;</code> (using valid JSON double-quoted keys as shown above), and add <code>&quot;appCheckDebugToken&quot;: &quot;&quot;</code>.</li>
+<li><strong><code>public/remote-config-defaults.json</code></strong>: Go to <strong>Firebase</strong> -&gt; <strong>DevOps &amp; Engagement</strong> -&gt; <strong>Feature Flagging</strong> -&gt; <strong>Remote Config</strong>, click the top-right <code>⋮</code> menu -&gt; <strong>Download default values</strong>, select <strong><code>.json</code></strong>, click <strong>Download file</strong>, and save/rename the downloaded <code>remote_config_defaults.json</code> file to <code>public/remote-config-defaults.json</code> (note the hyphens).</li>
 </ul>
 </aside>
-<p><strong>What this means:</strong> Keeps your Firebase credentials and Remote Config defaults out of Git while generating <code>public/firebase.config.json</code> and <code>public/remote-config-defaults.json</code> directly from your own Firebase project.</p>
+<p><strong>What this means:</strong> Even though Firebase Web SDK keys are public identifiers by design, committing an <code>apiKey</code> (<code>AIzaSy...</code>) to a repository triggers automated secret-scanning warning emails from GitHub and Google Cloud. Keeping <code>public/firebase.config.json</code> in <code>.gitignore</code> and generating it locally via script avoids noisy scanner alerts, while <code>npm run config:fetch</code> syncs <code>public/remote-config-defaults.json</code> with your project&#39;s Remote Config default values.</p>
 
         </div>
       </section>
 
       <section class="step-panel" data-step="8">
         <div class="step-header">
-          <h2>9. Part 2: Initialize Firebase and App Check Debug Mode in <code>ConfigService</code></h2>
-          <span class="step-duration">5 min</span>
+          <h2>9. Part 2: Initialize Firebase in <code>ConfigService</code></h2>
+          <span class="step-duration">3 min</span>
         </div>
         <div class="step-body">
-          <p>Because your Firebase project enforces <strong>App Check</strong>, running locally on <code>http://localhost:5005</code> requires registering an <strong>App Check debug token</strong> (see <a href="https://firebase.google.com/docs/ai-logic/app-check?api=dev">Use App Check with the debug provider</a>).</p>
+          <p>Because your Firebase project enforces <strong>App Check</strong>, initializing Firebase locally happens in three short steps across the next tabs:</p>
 <ol>
-<li>Open <code>src/app/services/config.service.ts</code> and complete the first <code>// TODO</code> block to import <code>@/public/firebase.config.json</code> (enabled via <code>&quot;resolveJsonModule&quot;: true</code> in <code>tsconfig.json</code>), initialize <code>FirebaseApp</code>, and configure App Check with debug mode:</li>
+<li><p>Initialize <code>FirebaseApp</code> in <code>ConfigService</code> and hook it into <code>app.config.ts</code>.</p>
+</li>
+<li><p>Enable <code>AppCheck</code> with <code>ReCaptchaEnterpriseProvider</code> in debug mode and register your debug token in the Firebase Console.</p>
+</li>
+<li><p>Save the debug token in <code>firebase/.env</code> and regenerate <code>public/firebase.config.json</code> (see <a href="https://firebase.google.com/docs/ai-logic/app-check?api=dev">Use App Check with the debug provider</a>).</p>
+</li>
+<li><p>Open <code>src/app/core/firebase/config.service.ts</code>:</p>
+<ul>
+<li>At the top of the file, import <code>firebaseConfig</code> from <code>&#39;@/public/firebase.config.json&#39;</code> (enabled via <code>&quot;resolveJsonModule&quot;: true</code> in <code>tsconfig.json</code>) and <code>initializeApp</code> from <code>&#39;firebase/app&#39;</code>:</li>
+</ul>
+</li>
 </ol>
-<pre><code class="language-typescript">// TODO (Step 2): Import the generated Firebase configuration JSON
-import firebaseConfig from &#39;@/public/firebase.config.json&#39;;
-import { Injectable, signal } from &#39;@angular/core&#39;;
-import { FirebaseApp, initializeApp } from &#39;firebase/app&#39;;
-import {
-  AppCheck,
-  CustomProvider,
-  initializeAppCheck,
-} from &#39;firebase/app-check&#39;;
-
-export interface AppRemoteConfig {
-  countryTemplateId: string;
-  summarizeTemplateId: string;
-}
-
-@Injectable({ providedIn: &#39;root&#39; })
-export class ConfigService {
-  private firebaseApp?: FirebaseApp;
-  private firebaseAppCheck?: AppCheck;
-
-  readonly remoteConfig = signal&lt;AppRemoteConfig&gt;({
-    countryTemplateId: &#39;&#39;,
-    summarizeTemplateId: &#39;&#39;,
-  });
-
-  get app(): FirebaseApp {
-    if (!this.firebaseApp) {
-      throw new Error(&#39;ConfigService has not been initialized yet.&#39;);
-    }
-    return this.firebaseApp;
-  }
-
-  initFirebase(): void {
-    if (this.firebaseApp) {
+<pre><code class="language-typescript">import firebaseConfig from &#39;@/public/firebase.config.json&#39;;
+import { initializeApp } from &#39;firebase/app&#39;;
+</code></pre>
+<ul>
+<li>Inside <code>ConfigService</code> (below <code>get app()</code>), add the <code>initialize()</code> method:</li>
+</ul>
+<pre><code class="language-typescript">  initialize(): void {
+    // Prevent double initialization
+    if (this.#firebaseApp) {
       return;
     }
-
-    this.firebaseApp = initializeApp(firebaseConfig.app);
-
-    // Enable App Check debug mode on localhost.
-    // Falls back to `true` when appCheckDebugToken is empty so the SDK logs a token.
-    if (location.hostname === &#39;localhost&#39;) {
-      (self as unknown as Record&lt;string, unknown&gt;)[&#39;FIREBASE_APPCHECK_DEBUG_TOKEN&#39;] =
-        firebaseConfig.appCheckDebugToken || true;
-    }
-
-    this.firebaseAppCheck = initializeAppCheck(this.firebaseApp, {
-      provider: new CustomProvider({
-        getToken: () =&gt; Promise.reject(new Error(&#39;Use App Check debug token on localhost&#39;)),
-      }),
-      isTokenAutoRefreshEnabled: true,
-    });
+    this.#firebaseApp = initializeApp(firebaseConfig.app);
   }
-}
 </code></pre>
 <ol start="2">
-<li>Start the Firebase App Hosting emulator (serves the Angular app at <code>http://localhost:5005</code>):</li>
-</ol>
-<pre><code class="language-bash">npm run firebase:emulators:start
-</code></pre>
-<ol start="3">
-<li>Open <code>http://localhost:5005</code> in your browser, then open <strong>Browser DevTools -&gt; Console</strong>. Copy the UUID from the App Check debug log:</li>
-</ol>
-<pre><code class="language-text">Firebase App Check debug token: 12345678-90ab-cdef-1234-567890abcdef
-</code></pre>
-<p><em>(Placeholder: add screenshot of DevTools Console showing the App Check debug token.)</em></p>
-<ol start="4">
-<li>In the <strong>Firebase Console</strong>, go to <strong>Build -&gt; App Check -&gt; Apps</strong>. On the right side of your web app row, click the <strong><code>⋮</code> (three-dots) menu</strong> <em>(this menu is easy to miss)</em> and select <strong>Manage debug tokens</strong>.</li>
-</ol>
-<p><em>(Placeholder: add screenshot of App Check -&gt; Apps -&gt; <code>⋮</code> -&gt; Manage debug tokens.)</em></p>
-<ol start="5">
-<li><p>Click <strong>Add debug token</strong>, paste the UUID, give it a recognizable name (for example, <code>Local Dev</code>), and click <strong>Save</strong>.</p>
-</li>
-<li><p>Paste that exact UUID into <code>firebase/.env</code>:</p>
+<li>Open <code>src/app/app.config.ts</code>:<ul>
+<li>At the top of the file, add <code>inject</code> and <code>provideAppInitializer</code> to the <code>&#39;@angular/core&#39;</code> import, and import <code>ConfigService</code>:</li>
+</ul>
 </li>
 </ol>
-<pre><code class="language-env">APP_FIREBASE_WEB_APP_NAME=&quot;&lt;Firebase Web App Display Name&gt;&quot;
-APP_FIREBASE_APPCHECK_DEBUG_TOKEN=&quot;12345678-90ab-cdef-1234-567890abcdef&quot;
+<pre><code class="language-typescript">import { inject, provideAppInitializer, provideBrowserGlobalErrorListeners } from &#39;@angular/core&#39;;
+import { ConfigService } from &#39;./core/firebase/config.service&#39;;
 </code></pre>
-<ol start="7">
-<li>Regenerate <code>public/firebase.config.json</code> and restart the emulator:</li>
-</ol>
-<pre><code class="language-bash">npm run config:generate
-npm run firebase:emulators:start
+<ul>
+<li>Inside <code>appConfig.providers</code>, add <code>provideAppInitializer</code> after <code>provideRouter(...)</code> so Angular calls <code>ConfigService.initialize()</code> at application startup:</li>
+</ul>
+<pre><code class="language-typescript">    provideAppInitializer(() =&gt; inject(ConfigService).initialize()),
 </code></pre>
-<aside class="callout callout-positive"><p><strong>Why assign the actual token instead of leaving <code>true</code>?</strong> When <code>FIREBASE_APPCHECK_DEBUG_TOKEN</code> is set to <code>true</code>, the SDK generates a brand-new random token for every browser profile or incognito window, forcing you to re-register it each time. Assigning the registered UUID lets <strong>all browsers (Chrome, Safari, Firefox, incognito) and restarts share the same debug token</strong>.</p>
-</aside>
-<p><strong>What this means:</strong> Firebase AI Logic blocks unverified requests when App Check is enforced; registering and reusing your debug token authorizes your local environment without weakening production security.</p>
+<p><strong>What this means:</strong> Initializes your <code>FirebaseApp</code> singleton once at Angular application startup using the locally generated <code>public/firebase.config.json</code>.</p>
 
         </div>
       </section>
 
       <section class="step-panel" data-step="9">
         <div class="step-header">
-          <h2>10. Part 2: Fetch Server Template IDs into <code>AppRemoteConfig</code> in <code>ConfigService</code></h2>
+          <h2>10. Part 2: Configure App Check Debug Mode and Register Your Debug Token in <code>ConfigService</code></h2>
+          <span class="step-duration">5 min</span>
+        </div>
+        <div class="step-body">
+          <ol>
+<li>Open <code>src/app/core/firebase/config.service.ts</code>:<ul>
+<li>At the top of the file, import <code>initializeAppCheck</code> and <code>ReCaptchaEnterpriseProvider</code> from <code>&#39;firebase/app-check&#39;</code>:</li>
+</ul>
+</li>
+</ol>
+<pre><code class="language-typescript">import { initializeAppCheck, ReCaptchaEnterpriseProvider } from &#39;firebase/app-check&#39;;
+</code></pre>
+<ul>
+<li>Inside <code>initialize()</code> (right below <code>this.#firebaseApp = initializeApp(firebaseConfig.app);</code>), configure <code>FIREBASE_APPCHECK_DEBUG_TOKEN</code> and initialize App Check:</li>
+</ul>
+<pre><code class="language-typescript">    // configure app check debug token
+    (globalThis as Record&lt;string, unknown&gt;)[&#39;FIREBASE_APPCHECK_DEBUG_TOKEN&#39;] =
+      firebaseConfig.appCheckDebugToken || true;
+
+    initializeAppCheck(this.#firebaseApp, {
+      provider: new ReCaptchaEnterpriseProvider(&#39;dummyKey&#39;),
+      isTokenAutoRefreshEnabled: true,
+    });
+</code></pre>
+<aside class="callout callout-positive"><p><strong>Why does <code>&#39;dummyKey&#39;</code> in <code>ReCaptchaEnterpriseProvider</code> work here?</strong> <code>initializeAppCheck()</code> requires a provider instance such as <code>ReCaptchaEnterpriseProvider</code>. However, when <code>FIREBASE_APPCHECK_DEBUG_TOKEN</code> is set, the Firebase App Check SDK intercepts token requests and exchanges your local debug token instead of calling reCAPTCHA Enterprise. In a production deployment, you replace <code>&#39;dummyKey&#39;</code> with a real reCAPTCHA Enterprise site key created in Google Cloud (see <a href="https://firebase.google.com/docs/app-check/web/recaptcha-enterprise-provider">Get started using App Check with reCAPTCHA Enterprise on web apps</a> if you are interested in configuring this provider).</p>
+</aside>
+<ol start="2">
+<li>If your app is currently running, stop it (<code>Ctrl+C</code>), then start the Firebase App Hosting emulator to restart the app:</li>
+</ol>
+<pre><code class="language-bash">npm run firebase:emulators:start
+</code></pre>
+<ol start="3">
+<li>Navigate to <code>http://localhost:5005</code> in your browser and open <strong>Chrome DevTools -&gt; Console</strong>. Find the App Check debug log:</li>
+</ol>
+<pre><code class="language-text">Firebase App Check debug token: &lt;app check debug token&gt;
+</code></pre>
+<p>Copy <code>&lt;app check debug token&gt;</code> and paste it to a temporary location first.</p>
+<img src="images/app-check-manage-debug-token.png" alt="Register app check debug token" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /><ol start="4">
+<li>In the <strong>Firebase Console</strong>, go to <strong>Firebase -&gt; App Check -&gt; Apps -&gt; Your apps</strong>, click the <strong><code>⋮</code> (three dots)</strong> menu on the right side of your web app row <em>(this menu is easy to miss)</em>, and select <strong>Manage debug tokens</strong> -&gt; <strong>Add debug token</strong>.</li>
+</ol>
+<p><em>(Placeholder: add screenshot of App Check -&gt; Apps -&gt; <code>⋮</code> -&gt; Manage debug tokens.)</em></p>
+<ol start="5">
+<li>Input a recognizable name (for example, <code>Local Dev</code>), paste <code>&lt;app check debug token&gt;</code> into <strong>Value</strong>, and click <strong>Save</strong>.</li>
+</ol>
+<p><strong>What this means:</strong> Authorizes your local debug token in Firebase App Check so Firebase AI Logic accepts requests from your local machine while keeping App Check enforcement active.</p>
+
+        </div>
+      </section>
+
+      <section class="step-panel" data-step="10">
+        <div class="step-header">
+          <h2>11. Part 2: Update <code>firebase/.env</code> and Regenerate <code>public/firebase.config.json</code></h2>
+          <span class="step-duration">2 min</span>
+        </div>
+        <div class="step-body">
+          <ol>
+<li>Paste that exact registered UUID into <code>APP_FIREBASE_APPCHECK_DEBUG_TOKEN</code> in <code>firebase/.env</code>:</li>
+</ol>
+<pre><code class="language-env">APP_FIREBASE_PROJECT_ID=&quot;&lt;Firebase Project ID&gt;&quot;
+APP_FIREBASE_WEB_APP_NAME=&quot;&lt;Firebase Web App Display Name&gt;&quot;
+APP_FIREBASE_APPCHECK_DEBUG_TOKEN=&quot;12345678-90ab-cdef-1234-567890abcdef&quot;
+</code></pre>
+<ol start="2">
+<li>Regenerate <code>public/firebase.config.json</code> so <code>&quot;appCheckDebugToken&quot;</code> contains your registered UUID, then restart the emulator:</li>
+</ol>
+<pre><code class="language-bash">npm run config:generate
+npm run firebase:emulators:start
+</code></pre>
+<aside class="callout callout-positive"><p><strong>What is <code>&quot;appCheckDebugToken&quot;</code> and why pin the UUID in <code>.env</code>?</strong></p>
+<ul>
+<li><strong>Why not leave it as <code>true</code>?</strong> When <code>FIREBASE_APPCHECK_DEBUG_TOKEN</code> is <code>true</code>, the SDK generates a brand-new random debug token for every browser profile or incognito window, forcing you to register a new token each time. Assigning your registered UUID to <code>&quot;appCheckDebugToken&quot;</code> lets <strong>all browsers (Chrome, Safari, Firefox, incognito) and restarts share the exact same debug token</strong>.</li>
+<li><strong>Why keep it out of Git?</strong> Unlike your Firebase Web <code>apiKey</code>, an <code>appCheckDebugToken</code> grants verified access to your protected backend resources (including Firebase AI Logic quota) and <strong>must remain private</strong>. Keeping <code>firebase/.env</code> and <code>public/firebase.config.json</code> in <code>.gitignore</code> ensures you never commit your debug token to GitHub.</li>
+</ul>
+</aside>
+<p><strong>What this means:</strong> Firebase AI Logic blocks unverified requests when App Check is enforced; initializing <code>FirebaseApp</code> + <code>AppCheck</code> on startup and pinning your registered debug token in <code>firebase/.env</code> authorizes your local environment across browsers without exposing secrets in Git.</p>
+
+        </div>
+      </section>
+
+      <section class="step-panel" data-step="11">
+        <div class="step-header">
+          <h2>12. Part 2: Fetch Server Template IDs into <code>AppRemoteConfig</code> in <code>ConfigService</code></h2>
           <span class="step-duration">4 min</span>
         </div>
         <div class="step-body">
@@ -945,9 +988,9 @@ import {
         </div>
       </section>
 
-      <section class="step-panel" data-step="10">
+      <section class="step-panel" data-step="12">
         <div class="step-header">
-          <h2>11. Part 2: Implement <code>AiService</code> for Server Prompt Templates</h2>
+          <h2>13. Part 2: Implement <code>AiService</code> for Server Prompt Templates</h2>
           <span class="step-duration">4 min</span>
         </div>
         <div class="step-body">
@@ -998,9 +1041,9 @@ export class AiService {
         </div>
       </section>
 
-      <section class="step-panel" data-step="11">
+      <section class="step-panel" data-step="13">
         <div class="step-header">
-          <h2>12. Part 2: Wire <code>CountryService</code> and <code>YoutubeSummarizerService</code></h2>
+          <h2>14. Part 2: Wire <code>CountryService</code> and <code>YoutubeSummarizerService</code></h2>
           <span class="step-duration">4 min</span>
         </div>
         <div class="step-body">
@@ -1091,9 +1134,9 @@ export class YoutubeSummarizerService {
         </div>
       </section>
 
-      <section class="step-panel" data-step="12">
+      <section class="step-panel" data-step="14">
         <div class="step-header">
-          <h2>13. Part 2: Connect Component Generate Buttons to Services</h2>
+          <h2>15. Part 2: Connect Component Generate Buttons to Services</h2>
           <span class="step-duration">3 min</span>
         </div>
         <div class="step-body">
@@ -1129,9 +1172,9 @@ export class YoutubeSummarizerService {
         </div>
       </section>
 
-      <section class="step-panel" data-step="13">
+      <section class="step-panel" data-step="15">
         <div class="step-header">
-          <h2>14. Part 2: Test the App on <code>http://localhost:5005</code></h2>
+          <h2>16. Part 2: Test the App on <code>http://localhost:5005</code></h2>
           <span class="step-duration">3 min</span>
         </div>
         <div class="step-body">
@@ -1149,9 +1192,9 @@ export class YoutubeSummarizerService {
         </div>
       </section>
 
-      <section class="step-panel" data-step="14">
+      <section class="step-panel" data-step="16">
         <div class="step-header">
-          <h2>15. Part 2: Update <code>countryTemplateId</code> to Animal Guide and Refresh</h2>
+          <h2>17. Part 2: Update <code>countryTemplateId</code> to Animal Guide and Refresh</h2>
           <span class="step-duration">4 min</span>
         </div>
         <div class="step-body">
@@ -1204,9 +1247,9 @@ export class YoutubeSummarizerService {
         </div>
       </section>
 
-      <section class="step-panel" data-step="15">
+      <section class="step-panel" data-step="17">
         <div class="step-header">
-          <h2>16. Part 2: Add Real-Time Remote Config Listener &amp; Revert Without Refresh</h2>
+          <h2>18. Part 2: Add Real-Time Remote Config Listener &amp; Revert Without Refresh</h2>
           <span class="step-duration">4 min</span>
         </div>
         <div class="step-body">

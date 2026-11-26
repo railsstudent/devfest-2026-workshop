@@ -721,106 +721,66 @@ Now implement `AiService`, which uses `aiBackend` from `ConfigService` (`getTemp
 
 <!-- ------------------------ -->
 
-## Part 2: Wire `CountryService` and `YoutubeSummarizerService`
-
-Duration: 4
-
-Both feature services read their active template ID from `ConfigService`'s `AppRemoteConfig` signal and pass `(templateId, params)` to `AiService`.
-
-1. Open `src/app/services/country.service.ts` and complete the `// TODO` block:
-
-```typescript
-import { inject, Injectable } from '@angular/core';
-import { AiService } from './ai.service';
-import { ConfigService } from './config.service';
-
-export interface GroundingSource {
-  title: string;
-  uri: string;
-}
-
-export interface CountryGuideResult {
-  text: string;
-  imageDataUrl: string | null;
-  webSearchQueries: string[];
-  sources: GroundingSource[];
-}
-
-@Injectable({ providedIn: 'root' })
-export class CountryService {
-  private readonly aiService = inject(AiService);
-  private readonly configService = inject(ConfigService);
-
-  async generateCountryGuide(
-    country: string,
-    templateId = this.configService.remoteConfig().countryTemplateId,
-  ): Promise<CountryGuideResult> {
-    const result = await this.aiService.generateFromTemplate(templateId, { country });
-
-    const response = result.response;
-    const candidate = response.candidates?.[0];
-
-    let imageDataUrl: string | null = null;
-    for (const part of candidate?.content?.parts ?? []) {
-      if (part.inlineData) {
-        imageDataUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-        break;
-      }
-    }
-
-    const groundingMetadata = candidate?.groundingMetadata;
-    const webSearchQueries = groundingMetadata?.webSearchQueries ?? [];
-    const sources: GroundingSource[] = (groundingMetadata?.groundingChunks ?? [])
-      .map((chunk) => chunk.web)
-      .filter((web): web is { title?: string; uri?: string } => Boolean(web?.uri))
-      .map((web) => ({
-        title: web.title || web.uri || 'Source',
-        uri: web.uri!,
-      }));
-
-    return {
-      text: response.text(),
-      imageDataUrl,
-      webSearchQueries,
-      sources,
-    };
-  }
-}
-```
-
-2. Open `src/app/services/youtube-summarizer.service.ts` and complete the `// TODO` block:
-
-```typescript
-import { inject, Injectable } from '@angular/core';
-import { AiService } from './ai.service';
-import { ConfigService } from './config.service';
-
-@Injectable({ providedIn: 'root' })
-export class YoutubeSummarizerService {
-  private readonly aiService = inject(AiService);
-  private readonly configService = inject(ConfigService);
-
-  async summarize(
-    url: string,
-    templateId = this.configService.remoteConfig().summarizeTemplateId,
-  ): Promise<string> {
-    const result = await this.aiService.generateFromTemplate(templateId, { url });
-    return result.response.text();
-  }
-}
-```
-
-**What this means:** Keeps domain logic modular—each feature service knows its own input shape (`{ country }` or `{ url }`) and passes the active template ID from `ConfigService`'s `AppRemoteConfig` signal into `AiService`.
-
-<!-- ------------------------ -->
-
 ## Part 2: Connect Component Generate Buttons to Services
 
 Duration: 3
 
-Now connect the pre-built Angular UI buttons to `CountryService` and `YoutubeSummarizerService`.
+1. Open `src/app/features/summarizer/summarizer.component.ts` and add the `AiService`, `ConfigService`, and `inject` imports at the top of the file:
 
-1. In the Country Guide component template and TypeScript class, wire the **Generate** button `(click)` event to a component method that calls `CountryService`:
+```typescript
+import { AiService } from '@/core/firebase/ai.service';
+import { ConfigService } from '@/core/firebase/config.service';
+import { Component, inject, signal } from '@angular/core';
+```
+
+2. At the top of the `SummarizerComponent` class body (right above `summarizerModel`), inject `AiService` and `ConfigService`:
+
+```typescript
+export default class SummarizerComponent {
+  #aiService = inject(AiService);
+  #configService = inject(ConfigService);
+
+  // ...omitted...
+```
+
+3. Inside `summarizerForm`, replace the `submission` option so form submission reads `summarizeTemplateId` from `ConfigService` and calls `AiService.generateResponse`:
+
+```typescript
+  summarizerForm = form(
+    this.summarizerModel,
+    (schemaPath) => {
+      // ...omitted...
+    },
+    {
+      submission: {
+        action: async () => {
+          this.videoSummary.set(DEFAULT_VIDEO_SUMMARY);
+          try {
+            const templateId = this.#configService.appConfig().summarizeTemplateId;
+            const result = await this.#aiService.generateResponse({
+              templateId,
+              templateVariables: this.summarizerModel(),
+            });
+
+            const videoSummary =
+              result && result.type === 'text' ? (JSON.parse(result.text) as VideoSummary) : DEFAULT_VIDEO_SUMMARY;
+            this.videoSummary.set(videoSummary);
+            return undefined;
+          } catch (e) {
+            this.videoSummary.set(DEFAULT_VIDEO_SUMMARY);
+            return { kind: 'serverError', message: 'Failed to submit form' };
+          }
+        },
+      },
+    },
+  );
+```
+
+**What `submission.action` does:** When the Signal Form is submitted, `action` reads `summarizeTemplateId` from `#configService.appConfig()`, calls `#aiService.generateResponse(...)` with `this.summarizerModel()`, parses the JSON `VideoSummary` into `this.videoSummary`, and returns `{ kind: 'serverError', message: 'Failed to submit form' }` if the request fails.
+
+Now connect the pre-built Angular UI buttons to `CountryService`.
+
+4. In the Country Guide component template and TypeScript class, wire the **Generate** button `(click)` event to a component method that calls `CountryService`:
 
 ```html
 <button type="button" (click)="onGenerateCountryGuide()" [disabled]="loading()">
@@ -833,22 +793,6 @@ async onGenerateCountryGuide(): Promise<void> {
   const templateId = this.configService.remoteConfig().countryTemplateId;
   const country = this.countrySignal();
   this.result.set(await this.countryService.generateCountryGuide(country, templateId));
-}
-```
-
-2. In the YouTube Summarizer component template and TypeScript class, wire the **Summarize** button `(click)` event to a component method that calls `YoutubeSummarizerService`:
-
-```html
-<button type="button" (click)="onSummarizeVideo()" [disabled]="loading()">
-  Generate Summary
-</button>
-```
-
-```typescript
-async onSummarizeVideo(): Promise<void> {
-  const templateId = this.configService.remoteConfig().summarizeTemplateId;
-  const url = this.youtubeUrlSignal();
-  this.summary.set(await this.youtubeService.summarize(url, templateId));
 }
 ```
 

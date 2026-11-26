@@ -566,11 +566,11 @@ Apply this resolution to the image: 512.
 <img src="images/server-template-response.png" alt="Server template test response" width="600" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 8px;" /></li>
 </ol>
 <hr>
-<h3>b) Country Food Guide (<code>country-food-guide-v-0-0-1</code>)</h3>
+<h3>b) Country Food Guide (<code>country-food-guide-v0-0-1</code>)</h3>
 <ul>
 <li><p><strong>Template Name</strong>: Country Food Guide</p>
 </li>
-<li><p><strong>Template ID</strong>: country-food-guide-v-0-0-1</p>
+<li><p><strong>Template ID</strong>: country-food-guide-v0-0-1</p>
 </li>
 <li><p><strong>Configuration</strong>:</p>
 </li>
@@ -611,11 +611,11 @@ Apply this resolution to the image: 512.
 <li>Click <strong>Run Prompt test</strong> to get the result.</li>
 </ol>
 <hr>
-<h3>c) Summarize YouTube URL (<code>summarize-youtube-url-v-0-0-1</code>)</h3>
+<h3>c) Summarize YouTube URL (<code>summarize-youtube-url-v0-0-1</code>)</h3>
 <ul>
 <li><p><strong>Template Name</strong>: Summarize YouTube URL</p>
 </li>
-<li><p><strong>Template ID</strong>: summarize-youtube-url-v-0-0-1</p>
+<li><p><strong>Template ID</strong>: summarize-youtube-url-v0-0-1</p>
 </li>
 <li><p><strong>Configuration</strong>:</p>
 </li>
@@ -680,14 +680,14 @@ You are an expert at summarizing videos, finding the topic, and generating tags 
   &quot;parameters&quot;: {
     &quot;countryTemplateId&quot;: {
       &quot;defaultValue&quot;: {
-        &quot;value&quot;: &quot;country-food-guide-v-0-0-1&quot;
+        &quot;value&quot;: &quot;country-food-guide-v0-0-1&quot;
       },
       &quot;description&quot;: &quot;Country Prompt Template Id&quot;,
       &quot;valueType&quot;: &quot;STRING&quot;
     },
     &quot;summarizeTemplateId&quot;: {
       &quot;defaultValue&quot;: {
-        &quot;value&quot;: &quot;summarize-youtube-url-v-0-0-1&quot;
+        &quot;value&quot;: &quot;summarize-youtube-url-v0-0-1&quot;
       },
       &quot;description&quot;: &quot;Summarize Template Id&quot;,
       &quot;valueType&quot;: &quot;STRING&quot;
@@ -1225,7 +1225,7 @@ export class YoutubeSummarizerService {
           <p>Verify that the entire local stack works end-to-end before testing Remote Config template switching.</p>
 <ol>
 <li>Open <code>http://localhost:5005</code> in your browser.</li>
-<li><strong>Test Country Guide</strong>: Enter a country (for example, <code>Japan</code>) and click <strong>Generate</strong>. Verify that the app displays the dish description, the generated food image (<code>country-food-guide-v-0-0-1</code>), and the Google Search grounding sources.</li>
+<li><strong>Test Country Guide</strong>: Enter a country (for example, <code>Japan</code>) and click <strong>Generate</strong>. Verify that the app displays the dish description, the generated food image (<code>country-food-guide-v0-0-1</code>), and the Google Search grounding sources.</li>
 </ol>
 <p><em>(Placeholder: add screenshot of the Angular app showing the Country Food Guide result.)</em></p>
 <ol start="3">
@@ -1242,7 +1242,7 @@ export class YoutubeSummarizerService {
           <span class="step-duration">Estimated duration: 4 min</span>
         </div>
         <div class="step-body">
-          <p>Now update <code>countryTemplateId</code> in Remote Config from <code>country-food-guide-v-0-0-1</code> to <code>country-animal-guide-v0-0-1</code> using the CLI scripts, then refresh the browser to see the AI output change with <strong>zero Angular code changes and zero redeployment</strong>.</p>
+          <p>Now update <code>countryTemplateId</code> in Remote Config from <code>country-food-guide-v0-0-1</code> to <code>country-animal-guide-v0-0-1</code> using the CLI scripts, then refresh the browser to see the AI output change with <strong>zero Angular code changes and zero redeployment</strong>.</p>
 <ol>
 <li>Pull the live Remote Config template from Firebase into <code>firebase/remote-config-template.json</code>:</li>
 </ol>
@@ -1256,7 +1256,7 @@ export class YoutubeSummarizerService {
 ✅ Successfully saved live template to: .../firebase/remote-config-template.json
 </code></pre>
 <ol start="2">
-<li>Open <code>firebase/remote-config-template.json</code> and update <code>countryTemplateId</code>&#39;s <code>defaultValue.value</code> from <code>country-food-guide-v-0-0-1</code> to <code>country-animal-guide-v0-0-1</code>:</li>
+<li>Open <code>firebase/remote-config-template.json</code> and update <code>countryTemplateId</code>&#39;s <code>defaultValue.value</code> from <code>country-food-guide-v0-0-1</code> to <code>country-animal-guide-v0-0-1</code>:</li>
 </ol>
 <pre><code class="language-json">&quot;countryTemplateId&quot;: {
   &quot;defaultValue&quot;: {
@@ -1297,7 +1297,7 @@ export class YoutubeSummarizerService {
           <span class="step-duration">Estimated duration: 4 min</span>
         </div>
         <div class="step-body">
-          <p>Finally, add a real-time Remote Config listener in <code>ConfigService</code> so updates to <code>AppRemoteConfig</code> take effect in-memory <strong>without refreshing the page</strong>, then revert <code>countryTemplateId</code> back to <code>country-food-guide-v-0-0-1</code>.</p>
+          <p>Finally, add a real-time Remote Config listener in <code>ConfigService</code> so updates to <code>AppRemoteConfig</code> take effect in-memory <strong>without refreshing the page</strong>, then revert <code>countryTemplateId</code> back to <code>country-food-guide-v0-0-1</code>.</p>
 <ol>
 <li>Open <code>src/app/services/config.service.ts</code> and add <code>onConfigUpdate</code> + <code>activate</code> (see <a href="https://firebase.google.com/docs/ai-logic/server-prompt-templates/versioning-with-remote-config?api=dev#add-a-real-time-remote-config-listener">Add a real-time Remote Config listener</a>):</li>
 </ol>
@@ -1326,10 +1326,10 @@ listenForUpdates(): void {
 <aside class="callout callout-positive"><p><strong>Note:</strong> Real-time Remote Config updates require enabling the <strong>Firebase Remote Config Realtime API</strong> in your Google Cloud project and keeping an active streaming connection. If conference Wi-Fi drops the stream, refresh the page as a fallback.</p>
 </aside>
 <ol start="2">
-<li><p>Revert <code>countryTemplateId</code> back to <code>country-food-guide-v-0-0-1</code>:</p>
+<li><p>Revert <code>countryTemplateId</code> back to <code>country-food-guide-v0-0-1</code>:</p>
 <ul>
 <li>Run <code>npm run config:pull</code>.</li>
-<li>Edit <code>firebase/remote-config-template.json</code> so <code>countryTemplateId</code> is <code>&quot;country-food-guide-v-0-0-1&quot;</code>.</li>
+<li>Edit <code>firebase/remote-config-template.json</code> so <code>countryTemplateId</code> is <code>&quot;country-food-guide-v0-0-1&quot;</code>.</li>
 <li>Run <code>npm run config:push</code> (or update and publish in <strong>Firebase Console -&gt; Remote Config</strong>).</li>
 </ul>
 </li>

@@ -273,7 +273,7 @@
   <header class="topbar">
     <h1 class="topbar-title">Build an Angular Web App with Firebase AI Logic Server Prompt Templates</h1>
     <div class="topbar-meta">
-      <span>Total: ~58 min</span>
+      <span>Total: ~60 min</span>
       <a href="https://github.com/railsstudent/devfest-2026-workshop" target="_blank" rel="noopener">GitHub Repo</a>
     </div>
   </header>
@@ -377,7 +377,7 @@
       <section class="step-panel active" data-step="0">
         <div class="step-header">
           <h2>1. Overview and Prerequisites</h2>
-          <span class="step-duration">Estimated duration: 1 min</span>
+          <span class="step-duration">Estimated duration: 2 min</span>
         </div>
         <div class="step-body">
           <p>Welcome to the <strong>Build an Angular Web App with Firebase AI Logic Server Prompt Templates</strong> workshop! This workshop is split into two parts:</p>
@@ -708,7 +708,7 @@ You are an expert at summarizing videos, finding the topic, and generating tags 
       <section class="step-panel" data-step="7">
         <div class="step-header">
           <h2>8. Part 2: Clone Starter Repo, Link <code>.firebaserc</code>, and Run Setup Scripts</h2>
-          <span class="step-duration">Estimated duration: 4 min</span>
+          <span class="step-duration">Estimated duration: 5 min</span>
         </div>
         <div class="step-body">
           <p>In Part 2, the Angular UI is already built for you. Your focus is connecting the Angular services to Firebase—<strong>App Check (Debug Mode)</strong>, <strong>Remote Config</strong>, and <strong>Firebase AI Logic Server Prompt Templates</strong>—and wiring the component generate buttons.</p>
@@ -808,7 +808,7 @@ Successfully generated .../public/firebase.config.json
       <section class="step-panel" data-step="8">
         <div class="step-header">
           <h2>9. Part 2: Initialize Firebase in <code>ConfigService</code></h2>
-          <span class="step-duration">Estimated duration: 3 min</span>
+          <span class="step-duration">Estimated duration: 2 min</span>
         </div>
         <div class="step-body">
           <p>Because your Firebase project enforces <strong>App Check</strong>, initializing Firebase locally happens in three short steps across the next tabs:</p>
@@ -861,7 +861,7 @@ import { ConfigService } from &#39;./core/firebase/config.service&#39;;
       <section class="step-panel" data-step="9">
         <div class="step-header">
           <h2>10. Part 2: Configure App Check Debug Mode and Register Your Debug Token in <code>ConfigService</code></h2>
-          <span class="step-duration">Estimated duration: 5 min</span>
+          <span class="step-duration">Estimated duration: 4 min</span>
         </div>
         <div class="step-body">
           <ol>
@@ -974,7 +974,7 @@ npm run firebase:emulators:start
       <section class="step-panel" data-step="12">
         <div class="step-header">
           <h2>13. Part 2: Fetch Server Template IDs into <code>AppRemoteConfig</code> in <code>ConfigService</code></h2>
-          <span class="step-duration">Estimated duration: 2 min</span>
+          <span class="step-duration">Estimated duration: 4 min</span>
         </div>
         <div class="step-body">
           <p>Next, update <code>ConfigService</code> to fetch your Remote Config parameters and store them in the <code>#appConfig</code> signal (<code>AppRemoteConfig</code>), which is exposed as the read-only <code>appConfig</code> signal.</p>
@@ -1041,7 +1041,7 @@ const ONE_HOUR_IN_MILLISECONDS = SECONDS * SECONDS * MILLISECONDS;
       <section class="step-panel" data-step="13">
         <div class="step-header">
           <h2>14. Part 2: Implement <code>AiService</code> for Server Prompt Templates</h2>
-          <span class="step-duration">Estimated duration: 4 min</span>
+          <span class="step-duration">Estimated duration: 2 min</span>
         </div>
         <div class="step-body">
           <p>Now implement <code>AiService</code>, which uses <code>aiBackend</code> from <code>ConfigService</code> (<code>getTemplateGenerativeModel</code>) and exposes <code>generateResponse</code> and <code>generateInlineData</code> for calling server prompt templates.</p>
@@ -1083,7 +1083,7 @@ const ONE_HOUR_IN_MILLISECONDS = SECONDS * SECONDS * MILLISECONDS;
       <section class="step-panel" data-step="14">
         <div class="step-header">
           <h2>15. Part 2: Connect Component Generate Buttons to Services</h2>
-          <span class="step-duration">Estimated duration: 3 min</span>
+          <span class="step-duration">Estimated duration: 5 min</span>
         </div>
         <div class="step-body">
           <ol>
@@ -1213,7 +1213,7 @@ import { Component, computed, inject, signal } from &#39;@angular/core&#39;;
       <section class="step-panel" data-step="16">
         <div class="step-header">
           <h2>17. Part 2: Update <code>countryTemplateId</code> to Animal Guide and Refresh</h2>
-          <span class="step-duration">Estimated duration: 4 min</span>
+          <span class="step-duration">Estimated duration: 3 min</span>
         </div>
         <div class="step-body">
           <p>Now update <code>countryTemplateId</code> in Remote Config from <code>country-food-guide-v0-0-1</code> to <code>country-animal-guide-v0-0-1</code> using the CLI scripts, then refresh the browser to see the AI output change with <strong>zero Angular code changes and zero redeployment</strong>.</p>
@@ -1267,7 +1267,7 @@ import { Component, computed, inject, signal } from &#39;@angular/core&#39;;
       <section class="step-panel" data-step="17">
         <div class="step-header">
           <h2>18. Part 2: Add Real-Time Remote Config Listener &amp; Revert Without Refresh</h2>
-          <span class="step-duration">Estimated duration: 4 min</span>
+          <span class="step-duration">Estimated duration: 5 min</span>
         </div>
         <div class="step-body">
           <p>Finally, add a real-time Remote Config listener in <code>ConfigService</code> so updates to <code>AppRemoteConfig</code> take effect in-memory <strong>without refreshing the page</strong>, then revert <code>countryTemplateId</code> back to <code>country-food-guide-v0-0-1</code>.</p>

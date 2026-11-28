@@ -12,7 +12,7 @@ feedback link:     https://github.com/railsstudent/devfest-2026-workshop
 
 ## Overview and Prerequisites
 
-Duration: 1
+Duration: 2
 
 Welcome to the **Build an Angular Web App with Firebase AI Logic Server Prompt Templates** workshop! This workshop is split into two parts:
 
@@ -346,7 +346,7 @@ Your Angular application will fetch these values at runtime so you can switch pr
 
 ## Part 2: Clone Starter Repo, Link `.firebaserc`, and Run Setup Scripts
 
-Duration: 4
+Duration: 5
 
 In Part 2, the Angular UI is already built for you. Your focus is connecting the Angular services to Firebase—**App Check (Debug Mode)**, **Remote Config**, and **Firebase AI Logic Server Prompt Templates**—and wiring the component generate buttons.
 
@@ -460,7 +460,7 @@ Successfully wrote .../public/remote-config-defaults.json
 
 ## Part 2: Initialize Firebase in `ConfigService`
 
-Duration: 3
+Duration: 2
 
 Because your Firebase project enforces **App Check**, initializing Firebase locally happens in three short steps across the next tabs:
 1. Initialize `FirebaseApp` in `ConfigService` and hook it into `app.config.ts`.
@@ -507,7 +507,7 @@ import { ConfigService } from './core/firebase/config.service';
 
 ## Part 2: Configure App Check Debug Mode and Register Your Debug Token in `ConfigService`
 
-Duration: 5
+Duration: 4
 
 1. Open `src/app/core/firebase/config.service.ts`:
    * At the top of the file, import `initializeAppCheck` and `ReCaptchaEnterpriseProvider` from `'firebase/app-check'`:
@@ -616,7 +616,7 @@ import { getAI, GoogleAIBackend } from 'firebase/ai';
 
 ## Part 2: Fetch Server Template IDs into `AppRemoteConfig` in `ConfigService`
 
-Duration: 2
+Duration: 4
 
 Next, update `ConfigService` to fetch your Remote Config parameters and store them in the `#appConfig` signal (`AppRemoteConfig`), which is exposed as the read-only `appConfig` signal.
 
@@ -684,7 +684,7 @@ const ONE_HOUR_IN_MILLISECONDS = SECONDS * SECONDS * MILLISECONDS;
 
 ## Part 2: Implement `AiService` for Server Prompt Templates
 
-Duration: 4
+Duration: 2
 
 Now implement `AiService`, which uses `aiBackend` from `ConfigService` (`getTemplateGenerativeModel`) and exposes `generateResponse` and `generateInlineData` for calling server prompt templates.
 
@@ -723,7 +723,7 @@ Now implement `AiService`, which uses `aiBackend` from `ConfigService` (`getTemp
 
 ## Part 2: Connect Component Generate Buttons to Services
 
-Duration: 3
+Duration: 5
 
 1. Open `src/app/features/summarizer/summarizer.component.ts` and add the `AiService`, `ConfigService`, and `inject` imports at the top of the file:
 
@@ -853,7 +853,7 @@ Verify that the entire local stack works end-to-end before testing Remote Config
 
 ## Part 2: Update `countryTemplateId` to Animal Guide and Refresh
 
-Duration: 4
+Duration: 3
 
 Now update `countryTemplateId` in Remote Config from `country-food-guide-v0-0-1` to `country-animal-guide-v0-0-1` using the CLI scripts, then refresh the browser to see the AI output change with **zero Angular code changes and zero redeployment**.
 
@@ -910,7 +910,7 @@ npm run config:push
 
 ## Part 2: Add Real-Time Remote Config Listener & Revert Without Refresh
 
-Duration: 4
+Duration: 5
 
 Finally, add a real-time Remote Config listener in `ConfigService` so updates to `AppRemoteConfig` take effect in-memory **without refreshing the page**, then revert `countryTemplateId` back to `country-food-guide-v0-0-1`.
 

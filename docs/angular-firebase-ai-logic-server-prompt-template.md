@@ -914,41 +914,109 @@ Duration: 4
 
 Finally, add a real-time Remote Config listener in `ConfigService` so updates to `AppRemoteConfig` take effect in-memory **without refreshing the page**, then revert `countryTemplateId` back to `country-food-guide-v0-0-1`.
 
-1. Open `src/app/services/config.service.ts` and add `onConfigUpdate` + `activate` (see [Add a real-time Remote Config listener](https://firebase.google.com/docs/ai-logic/server-prompt-templates/versioning-with-remote-config?api=dev#add-a-real-time-remote-config-listener)):
+1. Open `src/app/core/firebase/config.service.ts` and update the `@angular/core` and `firebase/remote-config` imports at the top of the file:
 
 ```typescript
-import { activate, onConfigUpdate } from 'firebase/remote-config';
-
-// Inside ConfigService:
-listenForUpdates(): void {
-  if (!this.firebaseRemoteConfig) {
-    return;
-  }
-
-  onConfigUpdate(this.firebaseRemoteConfig, {
-    next: async (configUpdate) => {
-      if (configUpdate.getUpdatedKeys().has('countryTemplateId')) {
-        await activate(this.firebaseRemoteConfig!);
-        this.remoteConfig.update((current) => ({
-          ...current,
-          countryTemplateId: getString(this.firebaseRemoteConfig!, 'countryTemplateId'),
-        }));
-      }
-    },
-    error: (error) => console.error('Remote Config listener error:', error),
-  });
-}
+import { DestroyRef, inject, isDevMode, Service, signal } from '@angular/core';
+// ...omitted...
+import type { RemoteConfig, Unsubscribe } from 'firebase/remote-config';
+import { activate, fetchAndActivate, getRemoteConfig, getString, onConfigUpdate } from 'firebase/remote-config';
 ```
+
+2. Add `#unsubscribe` below `#ai: AI | null = null;`, then add `private registerRemoteConfigListener` at the bottom of `ConfigService` (see [Add a real-time Remote Config listener](https://firebase.google.com/docs/ai-logic/server-prompt-templates/versioning-with-remote-config?api=dev#add-a-real-time-remote-config-listener)):
+
+```typescript
+  #unsubscribe: Unsubscribe | null = null;
+
+  // ...omitted...
+
+  private registerRemoteConfigListener(remoteConfig: RemoteConfig): void {
+    if (this.#unsubscribe) {
+      return;
+    }
+
+    this.#unsubscribe = onConfigUpdate(remoteConfig, {
+      next: async (configUpdated) => {
+        try {
+          console.log(configUpdated.getUpdatedKeys());
+          await activate(remoteConfig);
+          this.#appConfig.set({
+            summarizeTemplateId: getString(remoteConfig, 'summarizeTemplateId'),
+            countryTemplateId: getString(remoteConfig, 'countryTemplateId'),
+          });
+        } catch(e) {
+          // swallow error
+          console.warn('Error in onConfigUpdate():', e)
+        }
+      },
+      error: (error) => {
+          console.log("Config update error:", error);
+      },
+      complete: () => {
+          console.log("Listening stopped.");
+      }
+    });
+  }
+```
+
+**What `onConfigUpdate(...)` does:** `onConfigUpdate(remoteConfig, ...)` opens a real-time streaming listener to Firebase Remote Config and returns an `Unsubscribe` function (stored in `this.#unsubscribe`). Whenever a new Remote Config version is published, the `next` callback runs `await activate(remoteConfig)` to apply the newly fetched values in-memory and updates `this.#appConfig.set(...)`, so Angular components react immediately without a page reload; `error` and `complete` log connection errors or when listening stops.
+
+3. Inside `loadRemoteConfig()`, call `this.registerRemoteConfigListener(rc);` right after `this.#appConfig.set(...)`:
+
+```typescript
+  private async loadRemoteConfig(): Promise<void> {
+    try {
+      const rc = getRemoteConfig(this.app);
+      // ...omitted...
+      this.#appConfig.set({
+        summarizeTemplateId: getString(rc, 'summarizeTemplateId'),
+        countryTemplateId: getString(rc, 'countryTemplateId'),
+      });
+      this.registerRemoteConfigListener(rc);
+    } catch (e) {
+      console.warn('Remote Config fetch timed out or failed. Using defaults:', e);
+    }
+  }
+```
+
+4. Finally, add `#destroyRef` right below `#unsubscribe` and add `constructor()` to clean up the listener when `ConfigService` is destroyed:
+
+```typescript
+  #unsubscribe: Unsubscribe | null = null;
+  #destroyRef = inject(DestroyRef);
+
+  constructor() {
+    this.#destroyRef.onDestroy(() => {
+      if (this.#unsubscribe) {
+        this.#unsubscribe();
+        this.#unsubscribe = null;
+      }
+    });
+  }
+```
+
+**What `this.#destroyRef.onDestroy(...)` does:** Angular's `DestroyRef` registers a cleanup callback that runs automatically when `ConfigService` is destroyed (such as during app teardown or hot module reload). Calling `this.#unsubscribe()` closes the real-time `onConfigUpdate` stream and resets `#unsubscribe` to `null` to prevent memory leaks or dangling listeners.
 
 > aside positive
 > **Note:** Real-time Remote Config updates require enabling the **Firebase Remote Config Realtime API** in your Google Cloud project and keeping an active streaming connection. If conference Wi-Fi drops the stream, refresh the page as a fallback.
 
-2. Revert `countryTemplateId` back to `country-food-guide-v0-0-1`:
-   * Run `npm run config:pull`.
-   * Edit `firebase/remote-config-template.json` so `countryTemplateId` is `"country-food-guide-v0-0-1"`.
-   * Run `npm run config:push` (or update and publish in **Firebase Console -> Remote Config**).
+5. Revert `countryTemplateId` back to `country-food-guide-v0-0-1` in `firebase/remote-config-template.json`:
+   * Run `npm run config:pull` to pull the latest template.
+   * Open `firebase/remote-config-template.json` and update `countryTemplateId`'s `defaultValue.value` back to `"country-food-guide-v0-0-1"`:
 
-3. **Without refreshing** `http://localhost:5005`, submit `Japan` again. `CountryService` reads the updated `countryTemplateId` from `ConfigService`'s `AppRemoteConfig` signal and reverts to generating the **Food Guide**.
+```json
+"countryTemplateId": {
+  "defaultValue": {
+    "value": "country-food-guide-v0-0-1"
+  },
+  "description": "Country Prompt Template Id",
+  "valueType": "STRING"
+}
+```
+
+   * Run `npm run config:push` to publish the updated `firebase/remote-config-template.json` back to Firebase (or update and publish in **Firebase Console -> Remote Config**).
+
+6. **Without refreshing** `http://localhost:5005`, submit `Japan` again. `CountryComponent` reads the updated `countryTemplateId` from `ConfigService.appConfig()` and reverts to generating the **Food Guide**.
 
 **What this means:** Demonstrates real-time Remote Config + Angular Signal reactivity—your running app picks up server-side template changes instantly in memory without even a browser refresh.
 
